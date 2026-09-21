@@ -1,29 +1,33 @@
 {
   "name": "bf6-portal-sdk-docs",
-  "version": "2.0.0",
   "private": true,
-  "description": "BF6 Portal SDK Documentation Site — VitePress + TypeDoc pipeline",
   "type": "module",
-  "engines": { "node": ">=22.18.0" },
-  "packageManager": "pnpm@11.25.0",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
-    "docs:dev": "pnpm --filter @bf6-portal/docs dev",
-    "docs:build": "pnpm --filter @bf6-portal/docs build",
-    "docs:preview": "pnpm --filter @bf6-portal/docs preview",
-    "docs:extract": "tsx scripts/extract-sdk.ts --mod node_modules/bf6-portal-mod-types --utils node_modules/bf6-portal-utils --out apps/docs/src/data/sdk-data.json",
-    "docs:typedoc": "tsx scripts/generate-typedoc.ts",
-    "docs:generate": "pnpm run docs:extract",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "docs:generate-api": "typedoc",
+    "docs:dev": "pnpm run docs:generate-api && astro dev",
+    "docs:build": "pnpm run docs:generate-api && astro build",
+    "docs:preview": "astro preview",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.42.2",
+    "@fontsource/barlow-condensed": "^5.1.0",
+    "@fontsource/ibm-plex-sans": "^5.1.0",
+    "@fontsource/jetbrains-mono": "^5.1.0",
+    "astro": "^7.3.3",
+    "bf6-portal-utils": "^9.4.0",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
-    "@types/node": "^26.6.2",
-    "bf6-portal-mod-types": "4.3.0",
-    "bf6-portal-utils": "9.4.0",
-    "typedoc": "^0.28.16",
-    "typedoc-plugin-markdown": "^4.0.0",
-    "tsx": "^4.19.0",
-    "typescript": "^5.9.3",
-    "vitepress": "^1.6.4",
-    "vue": "^3.5.13"
+    "@astrojs/check": "^0.9.10",
+    "bf6-portal-mod-types": "^4.2.0",
+    "starlight-typedoc": "^0.23.1",
+    "typedoc": "^0.28.20",
+    "typedoc-plugin-markdown": "^4.13.1",
+    "typescript": "^5.7.0"
   }
 }

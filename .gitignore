@@ -1,11 +1,4 @@
 node_modules
 dist
-.vitepress/dist
-*.local
-.DS_Store
-*.log
-apps/docs/dist
-apps/docs/.vitepress/dist
-index.html
-sdk-data.json
-docs-data
+.astro
+src/content/docs/api

@@ -1,0 +1,69 @@
+---
+title: Installation
+description: Add bf6-portal-mod-types and bf6-portal-utils to a TypeScript Portal project.
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+## Requirements
+
+- Node.js 22 or later
+- TypeScript 5.4 or later
+- `strict: true` in your `tsconfig.json`
+
+## Install the packages
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install -D bf6-portal-mod-types
+    npm install bf6-portal-utils
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```bash
+    pnpm add -D bf6-portal-mod-types
+    pnpm add bf6-portal-utils
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```bash
+    yarn add -D bf6-portal-mod-types
+    yarn add bf6-portal-utils
+    ```
+  </TabItem>
+</Tabs>
+
+`bf6-portal-mod-types` is a dev dependency: it ships only `.d.ts` files that
+describe the `mod` global. `bf6-portal-utils` ships runtime code, so it is a
+regular dependency.
+
+## Configure TypeScript
+
+`mod` is declared as a **global ambient namespace** — you don't import it.
+Point `types` at the package instead:
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noImplicitAny": true,
+    "types": ["bf6-portal-mod-types"]
+  },
+  "include": ["src"]
+}
+```
+
+Make sure `include` covers every folder where you reference `mod`. No
+`/// <reference />` comment or import is needed once the package is listed in
+`types`.
+
+:::note
+`bf6-portal-utils` works differently: it has no global namespace and no
+single barrel import. Each module — Logger, UI, Timers, and so on — is
+imported from its own subpath, for example `bf6-portal-utils/logger`. See
+[bf6-portal-utils overview](../../utils/overview/).
+:::

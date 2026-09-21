@@ -1,0 +1,38 @@
+---
+title: Rule block helpers
+description: Compose repeatable rule logic with typed conditions and actions.
+pkg: utils
+version: "1.0"
+---
+
+## Define a rule
+
+A rule pairs a condition with an action. Both are typed against the event they
+handle.
+
+```ts
+interface Rule<TEvent> {
+  readonly when: (event: TEvent) => boolean;
+  readonly then: (event: TEvent) => void;
+}
+
+export function runRules<TEvent>(
+  event: TEvent,
+  rules: readonly Rule<TEvent>[],
+): void {
+  for (const rule of rules) {
+    if (rule.when(event)) rule.then(event);
+  }
+}
+```
+
+```ts
+import type { PlayerJoinedEvent } from "bf6-portal-mod-types";
+
+const welcome: Rule<PlayerJoinedEvent> = {
+  when: (e) => e.player.name.length > 0,
+  then: (e) => console.log(`Welcome, ${e.player.name}`),
+};
+
+runRules(event, [welcome]);
+```

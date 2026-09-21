@@ -1,0 +1,248 @@
+---
+interface Folder {
+  readonly id: string;
+  readonly pkg: "mod-types" | "utils";
+  readonly name: string;
+  readonly summary: string;
+  readonly href: string;
+  readonly cta: string;
+}
+
+interface Props {
+  readonly base: string;
+}
+
+const { base } = Astro.props;
+
+const folders: readonly Folder[] = [
+  {
+    id: "PKG-01",
+    pkg: "mod-types",
+    name: "mod (global namespace)",
+    summary:
+      "The global mod API from bf6-portal-mod-types: players, rules, UI primitives, and every Portal event. No imports required.",
+    href: `${base}mod-types/overview/`,
+    cta: "Read the mod namespace",
+  },
+  {
+    id: "PKG-02",
+    pkg: "utils",
+    name: "bf6-portal-utils",
+    summary:
+      "Independent modules for logging, UI wrappers, timers, clocks, event fan-out, and more. Each imported from its own subpath.",
+    href: `${base}utils/overview/`,
+    cta: "Read the utilities",
+  },
+];
+---
+
+<section class="cover">
+  <div class="cover__sheet">
+    <div class="cover__stripe" aria-hidden="true"></div>
+    <dl class="cover__meta">
+      <div><dt>Subject</dt><dd>Battlefield 6 Portal</dd></div>
+      <div><dt>Language</dt><dd>TypeScript, strict</dd></div>
+      <div><dt>Files</dt><dd>2</dd></div>
+    </dl>
+    <div class="cover__body">
+      <h1 class="cover__title">BF6 Portal SDK</h1>
+      <p class="cover__lede">
+        Typed Portal scripting. Find a module, copy a working snippet, ship
+        the mode.
+      </p>
+      <div class="cover__actions">
+        <a class="cover__btn cover__btn--primary" href={`${base}getting-started/installation/`}>Install</a>
+        <a class="cover__btn" href={`${base}api/utils/`}>Browse the utils API</a>
+      </div>
+    </div>
+    <span class="dossier__stamp cover__stamp">Cleared</span>
+  </div>
+
+  <div class="cover__folders">
+    {
+      folders.map((f) => (
+        <a class="folder" data-pkg={f.pkg} href={f.href}>
+          <span class="folder__tab">{f.id}</span>
+          <span class="folder__name">{f.name}</span>
+          <span class="folder__summary">{f.summary}</span>
+          <span class="folder__cta">{f.cta}</span>
+        </a>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .cover {
+    max-width: 64rem;
+    margin-inline: auto;
+    display: grid;
+    gap: 2rem;
+  }
+
+  .cover__sheet {
+    position: relative;
+    border: 1px solid var(--sl-color-hairline);
+    background: var(--dossier-panel);
+  }
+
+  .cover__stripe {
+    height: 12px;
+    background: var(--dossier-stripe);
+  }
+
+  .cover__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1.5rem;
+    margin: 0;
+    padding: 0.5rem 1.25rem;
+    border-bottom: 1px solid var(--sl-color-hairline);
+    font-family: var(--font-code);
+    font-size: 0.75rem;
+    color: var(--sl-color-gray-3);
+  }
+  .cover__meta > div {
+    white-space: nowrap;
+  }
+  .cover__meta dt {
+    display: inline;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-right: 0.4em;
+  }
+  .cover__meta dd {
+    display: inline;
+    margin: 0;
+    color: var(--sl-color-gray-1);
+  }
+
+  .cover__body {
+    padding: 2.5rem 1.5rem 2.5rem 1.75rem;
+    padding-right: 11rem;
+  }
+
+  .cover__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(3rem, 9vw, 6rem);
+    line-height: 0.95;
+    margin: 0 0 1rem;
+    color: var(--sl-color-white);
+  }
+
+  .cover__lede {
+    max-width: 46ch;
+    margin: 0 0 1.75rem;
+    font-size: var(--sl-text-lg);
+    color: var(--sl-color-gray-2);
+  }
+
+  .cover__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .cover__btn {
+    display: inline-block;
+    padding: 0.6rem 1.25rem;
+    border: 2px solid var(--sl-color-accent-high);
+    color: var(--sl-color-accent-high);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.125rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+  .cover__btn--primary {
+    background: var(--sl-color-accent-high);
+    color: var(--sl-color-black);
+  }
+  .cover__btn:hover {
+    filter: brightness(1.12);
+  }
+
+  .cover__stamp {
+    right: 2rem;
+    bottom: auto;
+    top: 4.5rem;
+    font-size: 1.75rem;
+  }
+
+  .cover__folders {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 1.5rem;
+  }
+
+  .folder {
+    --pkg-accent: var(--dossier-amber);
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+    padding: 2rem 1.5rem 1.5rem;
+    border: 1px solid var(--sl-color-hairline);
+    border-top: 4px solid var(--pkg-accent);
+    background: var(--dossier-panel);
+    color: var(--sl-color-gray-1);
+    text-decoration: none;
+  }
+  .folder[data-pkg="utils"] {
+    --pkg-accent: var(--dossier-olive);
+  }
+  :global(:root[data-theme="light"]) .folder {
+    --pkg-accent: #8a5a00;
+  }
+  :global(:root[data-theme="light"]) .folder[data-pkg="utils"] {
+    --pkg-accent: #3f4a17;
+  }
+
+  .folder__tab {
+    position: absolute;
+    top: -1px;
+    right: 1rem;
+    padding: 0.15rem 0.6rem;
+    background: var(--pkg-accent);
+    color: var(--sl-color-black);
+    font-family: var(--font-code);
+    font-size: 0.75rem;
+    transform: translateY(-100%);
+  }
+  .folder__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.6rem;
+    line-height: 1.1;
+    color: var(--sl-color-white);
+  }
+  .folder__summary {
+    color: var(--sl-color-gray-2);
+    line-height: 1.55;
+  }
+  .folder__cta {
+    margin-top: 0.5rem;
+    font-weight: 600;
+    color: var(--pkg-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .folder:hover {
+    background: var(--sl-color-bg-nav);
+  }
+
+  @media (max-width: 40rem) {
+    .cover__body {
+      padding-right: 1.5rem;
+      padding-top: 2rem;
+      padding-bottom: 4.5rem;
+    }
+    .cover__stamp {
+      top: auto;
+      bottom: 1.25rem;
+      right: 1rem;
+      font-size: 1.25rem;
+    }
+  }
+</style>

@@ -1,0 +1,35 @@
+---
+title: State management
+description: Typed per-player and per-round state containers.
+pkg: utils
+version: "1.0"
+---
+
+## Per-player state
+
+Key state by player id and give each entry a defined shape.
+
+```ts
+interface PlayerState {
+  kills: number;
+  deaths: number;
+}
+
+const state = new Map<string, PlayerState>();
+
+export function getState(playerId: string): PlayerState {
+  const existing = state.get(playerId);
+  if (existing) return existing;
+  const fresh: PlayerState = { kills: 0, deaths: 0 };
+  state.set(playerId, fresh);
+  return fresh;
+}
+```
+
+## Reset between rounds
+
+```ts
+export function resetRound(): void {
+  state.clear();
+}
+```

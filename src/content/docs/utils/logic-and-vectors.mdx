@@ -1,0 +1,44 @@
+---
+title: Logic helpers and vector math
+description: Numeric helpers and 3D vector operations.
+pkg: utils
+version: "1.0"
+---
+
+## clamp
+
+Limit a number to a range.
+
+```ts
+export function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+```
+
+```ts
+clamp(150, 0, 100); // 100
+clamp(-5, 0, 100); // 0
+```
+
+## Vector distance
+
+```ts
+interface Vec3 {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+}
+
+export function distance(a: Vec3, b: Vec3): number {
+  return Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+```
+
+```ts
+const d = distance({ x: 0, y: 0, z: 0 }, { x: 3, y: 4, z: 0 }); // 5
+```
+
+:::caution
+These bodies show the documentation pattern. Replace them with the real
+signatures from `packages/bf6-portal-utils/src`.
+:::

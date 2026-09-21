@@ -1,0 +1,64 @@
+---
+title: Logger
+description: Static and scrolling on-screen debug logs, per player or team.
+pkg: utils
+version: "9.4"
+---
+
+`bf6-portal-utils/logger` prints arbitrary runtime text directly on screen
+during a match. Battlefield Portal normally only lets you display strings
+pre-uploaded via `strings.json`; Logger works around that with a character-
+map UI so you can log any runtime value, including on console builds where
+there is no filesystem for `console.log`.
+
+```ts
+import { Logger } from "bf6-portal-utils/logger";
+
+let staticLogger: Logger | undefined;
+let dynamicLogger: Logger | undefined;
+
+export async function OnPlayerDeployed(eventPlayer: mod.Player): Promise<void> {
+  if (!staticLogger) {
+    staticLogger = new Logger(eventPlayer, {
+      staticRows: true,
+      visible: true,
+      anchor: mod.UIAnchor.TopLeft,
+      width: 600,
+    });
+    dynamicLogger = new Logger(eventPlayer, {
+      staticRows: false,
+      visible: true,
+      anchor: mod.UIAnchor.TopRight,
+    });
+  }
+
+  dynamicLogger?.log(`Player: ${mod.GetObjId(eventPlayer)}`);
+
+  // Long messages or hot paths: prefer logAsync() so the write goes through
+  // the microtask queue instead of blocking the frame.
+  dynamicLogger?.logAsync("Very long diagnostic message...");
+}
+```
+
+- **Dynamic mode** (`staticRows: false`) behaves like a scrolling console:
+  new lines append at the bottom and push older ones up.
+- **Static mode** (`staticRows: true`) lets you pin a value to a specific
+  `rowIndex`, so a position or timer can occupy the same row on every
+  update while other rows fill in around it.
+- **`log()` vs `logAsync()`** — `logAsync()` is non-blocking and preferred
+  for long text or tall dynamic loggers, since it avoids creating many UI
+  widgets synchronously in one frame. Use `log()` only for short messages
+  where you need strict ordering.
+
+:::caution
+Logger depends on the UI module, which depends on Events. Once you use
+Logger, subscribe to Portal events only through `Events.OnX.subscribe(...)`
+from `bf6-portal-utils/events` — never export your own `On*` handler
+functions.
+:::
+
+:::note
+Bundle with `bf6-portal-bundler`, which automatically merges each module's
+`strings.json` — including Logger's character-map strings — into your
+project.
+:::

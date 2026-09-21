@@ -1,0 +1,109 @@
+---
+title: Events, Timers, and Clocks
+description: Subscribe to Portal events from anywhere, run cancellable timers, and drive match countdowns.
+pkg: utils
+version: "9.4"
+---
+
+## Events
+
+Battlefield Portal allows only **one** implementation of each event handler
+function (`OnPlayerDeployed`, `OngoingPlayer`, and so on) per project. The
+Events module (`bf6-portal-utils/events`) implements every Portal event
+handler exactly once, internally, and exposes a subscribe API so any part
+of your code can listen to any event.
+
+```ts
+import { Events } from "bf6-portal-utils/events";
+
+Events.setLogging((text) => console.log(text), Events.LogLevel.Warning, true);
+
+function handlePlayerDeployed(player: mod.Player): void {
+  console.log(`Player ${mod.GetObjId(player)} deployed`);
+}
+
+const unsubscribe = Events.OnPlayerDeployed.subscribe(handlePlayerDeployed);
+
+// Later, e.g. when the game mode ends:
+Events.OnGameModeEnding.subscribe(() => {
+  unsubscribe();
+});
+```
+
+Two equivalent styles are available:
+
+- **Event-channel style** (recommended) — `Events.OnPlayerDied.subscribe(handler)`.
+  Better IntelliSense, since the event name and method are colocated.
+- **Object style** — `Events.subscribe(Events.Type.OnPlayerDeployed, handler)`.
+  Useful when you need to pass an event type by value, such as dynamic
+  dispatch or iteration.
+
+Handlers can be sync or async. Synchronous handlers run immediately when the
+event fires; async handlers are preferred for non-trivial work. Every
+handler is invoked through Callback Handler, so a throw or rejection in one
+handler cannot stop the others from running.
+
+:::caution
+Never export your own Portal event handler function once you use Events (or
+any module that depends on it — Logger, UI, and Multi-Click Detector all
+do). Events already owns every hook.
+:::
+
+## Timers
+
+`bf6-portal-utils/timers` reintroduces `setTimeout` and `setInterval` on top
+of `mod.Wait()`, since Portal's QuickJS runtime doesn't provide them
+natively. Timers can be cancelled, and many can run concurrently without
+blocking each other.
+
+```ts
+import { Timers } from "bf6-portal-utils/timers";
+
+let respawnTimeout: number | undefined;
+
+export async function OnPlayerDied(
+  victim: mod.Player,
+  killer: mod.Player,
+  deathType: mod.DeathType,
+  weapon: mod.WeaponUnlock,
+): Promise<void> {
+  respawnTimeout = Timers.setTimeout(() => {
+    mod.SpawnPlayer(victim, mod.GetRandomSpawnPoint(mod.GetTeam(victim)));
+  }, 10_000);
+}
+
+export async function OnPlayerDeployed(eventPlayer: mod.Player): Promise<void> {
+  // clearTimeout, clearInterval, and clear are interchangeable
+  Timers.clear(respawnTimeout);
+  respawnTimeout = undefined;
+}
+```
+
+## Clocks
+
+`bf6-portal-utils/clocks` provides `CountUpClock` (stopwatch) and
+`CountDownClock` (timer). Both track whole-second boundaries internally to
+minimize drift, and fire `onSecond`, `onMinute`, and `onComplete` callbacks
+only when the corresponding integer value actually changes.
+
+```ts
+import { Clocks } from "bf6-portal-utils/clocks";
+import { Events } from "bf6-portal-utils/events";
+
+let roundClock: Clocks.CountDownClock;
+
+Events.OnGameModeStarted.subscribe(() => {
+  roundClock = new Clocks.CountDownClock(5 * 60, {
+    onSecond: (seconds) => updateTimerDisplay(seconds),
+    onMinute: (minutes) => announceMinute(minutes),
+    onComplete: () => endRound(),
+  });
+  roundClock.start();
+});
+```
+
+:::note
+Timers, Events, UI, and Clocks all use Callback Handler internally to invoke
+your callbacks safely — a throwing or rejecting callback is caught and
+logged rather than crashing the calling code.
+:::

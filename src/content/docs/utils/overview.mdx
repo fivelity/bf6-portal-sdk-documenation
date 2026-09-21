@@ -1,0 +1,66 @@
+---
+title: Overview
+description: How bf6-portal-utils is organized and how to import each module.
+pkg: utils
+stamp: Active dev
+version: "9.4"
+---
+
+`bf6-portal-utils` is a collection of independent, focused modules for
+Battlefield 6 Portal development. There is no barrel export — each module is
+its own subpath import.
+
+```ts
+import { Logger } from "bf6-portal-utils/logger";
+import { UI } from "bf6-portal-utils/ui";
+import { Events } from "bf6-portal-utils/events";
+```
+
+## Modules
+
+| Module | Import path | Purpose |
+| --- | --- | --- |
+| Events | `bf6-portal-utils/events` | The single owner of every Portal event hook; subscribe from anywhere |
+| Logger | `bf6-portal-utils/logger` | On-screen static and scrolling debug logs |
+| UI | `bf6-portal-utils/ui` | Object-oriented wrappers over Portal's UI APIs |
+| Timers | `bf6-portal-utils/timers` | `setTimeout` / `setInterval` for Portal's QuickJS runtime |
+| Clocks | `bf6-portal-utils/clocks` | Count-up and count-down match timers |
+| Benchmarker | `bf6-portal-utils/benchmarker` | Measure and budget per-tick work |
+| Callback Handler | `bf6-portal-utils/callback-handler` | Safely invoke sync/async callbacks |
+| Logging | `bf6-portal-utils/logging` | Shared logging primitive used by the other modules |
+| Map Detector | `bf6-portal-utils/map-detector` | Identify the current map by HQ coordinates |
+| Multi-Click Detector | `bf6-portal-utils/multi-click-detector` | Detect rapid repeated soldier-state changes |
+| Mod Extensions | `bf6-portal-utils/mod-extensions` | Typed helpers for undocumented `mod` behavior |
+| SolidUI | `bf6-portal-utils/solid-ui` | Fine-grained reactive UI on top of the UI module |
+| Sounds | `bf6-portal-utils/sounds` | Pooled sound playback management |
+| Performance Stats | `bf6-portal-utils/performance-stats` | Server tick rate and script lag metrics |
+| Vectors | `bf6-portal-utils/vectors` | Vector math helpers |
+| Raycast | `bf6-portal-utils/raycast` | Raycasting against the world |
+| Portal Gadget | `bf6-portal-utils/portal-gadget` | Helpers for custom gadgets |
+| Player Undeploy Fixer | `bf6-portal-utils/player-undeploy-fixer` | Works around an undeploy edge case |
+| Scavenger Drop | `bf6-portal-utils/scavenger-drop` | Scavenger-style item drops |
+| FFA Drop-ins / Spawn Points | `bf6-portal-utils/ffa-drop-ins`, `bf6-portal-utils/ffa-spawn-points` | Free-for-all drop-in and spawn helpers |
+
+## Events owns every Portal hook
+
+The most important rule in this package: **Events subscribes to every
+Portal event hook internally, once.** Logger, UI, and Multi-Click Detector
+all depend on Events for their own internal wiring.
+
+:::caution
+Do not export your own `OnPlayerDeployed`, `OngoingPlayer`, or any other
+Portal event handler function anywhere in your code once you use Events (or
+any module that depends on it, which is most of them). Only one
+implementation per event can exist per project, and Events already owns
+that implementation. Subscribe with `Events.OnPlayerDeployed.subscribe(...)`
+instead.
+:::
+
+See [Events, Timers, and Clocks](../events-timers-clocks/) for the
+subscribe/unsubscribe API.
+
+:::tip
+The [API Reference](/bf6-portal-sdk-documenation/api/utils/) section has a
+generated reference for the Logger and UI modules, built directly from the
+installed package's type declarations.
+:::
