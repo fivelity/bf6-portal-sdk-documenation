@@ -11,8 +11,8 @@
     "serve": "npx serve ."
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "bf6-portal-mod-types": "4.2.0",
+    "@types/node": "^26.6.2",
+    "bf6-portal-mod-types": "4.3.0",
     "bf6-portal-utils": "9.4.0",
     "typescript": "^5.6.0"
   }
