@@ -1,0 +1,23 @@
+{
+  "name": "@bf6-portal/docs",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev src",
+    "build": "vitepress build src",
+    "preview": "vitepress preview src",
+    "typedoc": "typedoc --options typedoc.json"
+  },
+  "dependencies": {
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "typedoc": "^0.28.16",
+    "typedoc-plugin-markdown": "^4.0.0",
+    "@types/node": "^26.6.2",
+    "typescript": "^5.9.3",
+    "sass": "^1.89.0"
+  }
+}

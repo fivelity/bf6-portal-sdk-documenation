@@ -1,19 +1,29 @@
 {
   "name": "bf6-portal-sdk-docs",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "Searchable reference SPA for bf6-portal-mod-types and bf6-portal-utils",
+  "description": "BF6 Portal SDK Documentation Site — VitePress + TypeDoc pipeline",
   "type": "module",
   "engines": { "node": ">=22.18.0" },
+  "packageManager": "pnpm@11.25.0",
   "scripts": {
-    "docs:extract": "node scripts/extract-sdk.ts --mod node_modules/bf6-portal-mod-types --utils node_modules/bf6-portal-utils --out sdk-data.json --inline index.html",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "serve": "npx serve ."
+    "docs:dev": "pnpm --filter @bf6-portal/docs dev",
+    "docs:build": "pnpm --filter @bf6-portal/docs build",
+    "docs:preview": "pnpm --filter @bf6-portal/docs preview",
+    "docs:extract": "tsx scripts/extract-sdk.ts --mod node_modules/bf6-portal-mod-types --utils node_modules/bf6-portal-utils --out apps/docs/src/data/sdk-data.json",
+    "docs:typedoc": "tsx scripts/generate-typedoc.ts",
+    "docs:generate": "pnpm run docs:extract",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
     "@types/node": "^26.6.2",
     "bf6-portal-mod-types": "4.3.0",
     "bf6-portal-utils": "9.4.0",
-    "typescript": "^5.6.0"
+    "typedoc": "^0.28.16",
+    "typedoc-plugin-markdown": "^4.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.3",
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.13"
   }
 }

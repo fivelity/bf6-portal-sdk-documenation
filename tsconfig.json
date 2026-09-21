@@ -9,7 +9,10 @@
     "skipLibCheck": true,
     "types": ["node"],
     "noEmit": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "outDir": "dist",
+    "rootDir": "."
   },
-  "include": ["scripts/**/*.ts"]
+  "include": ["scripts/**/*.ts", "apps/docs/src/**/*.ts", "apps/docs/src/**/*.js", "apps/docs/src/**/*.md"],
+  "tsx": true
 }

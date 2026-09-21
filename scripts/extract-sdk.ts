@@ -187,8 +187,8 @@ function flag(name: string): string | undefined {
 
 const modDir = path.resolve(flag('--mod') ?? 'node_modules/bf6-portal-mod-types');
 const utilsDir = path.resolve(flag('--utils') ?? 'node_modules/bf6-portal-utils');
-const outFile = path.resolve(flag('--out') ?? 'sdk-data.json');
-const inlineFile = flag('--inline');
+const outFile = path.resolve(flag('--out') ?? 'apps/docs/src/data/sdk-data.json');
+const inlineFile = flag('--inline') ?? 'apps/docs/src/index.md';
 
 /* ------------------------------------------------------------------------------------------------
  * Small helpers
@@ -854,15 +854,18 @@ console.log(`  utils ${data.utils.pkg.version}: ${data.utils.modules.length} mod
 
 if (inlineFile) {
     const target = path.resolve(inlineFile);
-    const html = readText(target);
-    const START = '<!--SDK-DATA-START-->';
-    const END = '<!--SDK-DATA-END-->';
-    const a = html.indexOf(START);
-    const b = html.indexOf(END);
-    if (a < 0 || b < 0) throw new Error(`Markers ${START} / ${END} not found in ${inlineFile}`);
-    // "</" must not appear literally inside a <script> block.
-    const safe = json.replace(/<\//g, '<\\/');
-    const block = `${START}<script id="sdk-data" type="application/json">${safe}</script>${END}`;
-    fs.writeFileSync(target, html.slice(0, a) + block + html.slice(b + END.length));
-    console.log(`  inlined into ${path.relative(process.cwd(), target)}`);
+    if (fs.existsSync(target)) {
+        const html = readText(target);
+        const START = '<!--SDK-DATA-START-->';
+        const END = '<!--SDK-DATA-END-->';
+        const a = html.indexOf(START);
+        const b = html.indexOf(END);
+        if (a >= 0 && b >= 0) {
+            // "</" must not appear literally inside a <script> block.
+            const safe = json.replace(/<\//g, '<\\/');
+            const block = `${START}<script id="sdk-data" type="application/json">${safe}</script>${END}`;
+            fs.writeFileSync(target, html.slice(0, a) + block + html.slice(b + END.length));
+            console.log(`  inlined into ${path.relative(process.cwd(), target)}`);
+        }
+    }
 }
