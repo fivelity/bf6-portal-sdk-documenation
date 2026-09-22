@@ -1,93 +1,82 @@
 // @ts-check
-import { defineConfig } from "astro/config";
-import starlight from "@astrojs/starlight";
-import starlightTypeDoc, { typeDocSidebarGroup } from "starlight-typedoc";
+import { defineConfig } from 'astro/config';
+import starlight from '@astrojs/starlight';
 
-// GitHub Pages project site: https://fivelity.github.io/bf6-portal-sdk-documenation/
-// "documenation" matches the repo name's actual spelling on GitHub.
-const REPO = "bf6-portal-sdk-documenation";
+// Update `site` and `base` to match your GitHub Pages URL before deploying.
+// For a project page at https://<user>.github.io/<repo>/ set base to '/<repo>'.
+const SITE_URL = 'https://fivelity.github.io';
+const BASE_PATH = '/bf6-portal-sdk-docs';
 
 export default defineConfig({
-  site: "https://fivelity.github.io",
-  base: `/${REPO}`,
+  site: SITE_URL,
+  base: BASE_PATH,
+  outDir: './dist',
   integrations: [
     starlight({
-      title: "BF6 Portal SDK",
+      title: 'BF6 Portal SDK',
       description:
-        "Guides and generated API reference for bf6-portal-utils, plus how it fits with the global mod namespace from bf6-portal-mod-types.",
+        'Documentation for bf6-portal-mod-types and bf6-portal-utils — the TypeScript SDK for Battlefield 6 Portal custom game modes.',
+      customCss: ['./src/styles/wardogs-theme.css'],
       social: [
         {
-          icon: "github",
-          label: "GitHub",
-          href: `https://github.com/fivelity/${REPO}`,
+          icon: 'github',
+          label: 'GitHub',
+          href: 'https://github.com/fivelity/bf6-portal-sdk-docs',
         },
       ],
-      customCss: [
-        "@fontsource/barlow-condensed/500.css",
-        "@fontsource/barlow-condensed/700.css",
-        "@fontsource/ibm-plex-sans/400.css",
-        "@fontsource/ibm-plex-sans/600.css",
-        "@fontsource/jetbrains-mono/400.css",
-        "./src/styles/dossier.css",
-      ],
-      components: {
-        PageTitle: "./src/components/DossierTitle.astro",
+      editLink: {
+        baseUrl: 'https://github.com/fivelity/bf6-portal-sdk-docs/edit/main/',
       },
-      plugins: [
-        // bf6-portal-utils ships no single barrel entry point — each module is
-        // its own subpath export (bf6-portal-utils/logger, /ui, and so on).
-        // TypeDoc reads the installed package's .d.ts for each confirmed
-        // subpath directly from node_modules. Add a line here for every
-        // subpath your installed version actually exports; see SETUP.md.
-        starlightTypeDoc({
-          entryPoints: [
-            "./node_modules/bf6-portal-utils/logger/index.d.ts",
-            "./node_modules/bf6-portal-utils/ui/index.d.ts",
-          ],
-          tsconfig: "./tsconfig.typedoc.json",
-          output: "api/utils",
-          sidebar: {
-            label: "bf6-portal-utils API",
-            collapsed: true,
-          },
-          typeDoc: {
-            entryPointStrategy: "expand",
-            skipErrorChecking: true,
-            excludePrivate: true,
-            excludeInternal: true,
-          },
-        }),
-      ],
+      lastUpdated: true,
+      pagination: true,
+      favicon: '/favicon.svg',
+      expressiveCode: {
+        themes: ['github-dark', 'github-light'],
+        styleOverrides: {
+          borderRadius: '2px',
+          codeFontFamily:
+            "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
+          codeFontSize: '0.85rem',
+        },
+      },
       sidebar: [
         {
-          label: "Getting Started",
+          label: 'Getting Started',
           items: [
-            { label: "Installation", slug: "getting-started/installation" },
-            { label: "Core concepts", slug: "getting-started/core-concepts" },
-            { label: "Quickstart", slug: "getting-started/quickstart" },
+            { label: 'Introduction', slug: 'guides/introduction' },
+            { label: 'Installation & Setup', slug: 'guides/installation' },
+            { label: 'Architecture & Core Concepts', slug: 'guides/architecture' },
+            { label: 'Quickstart Guide', slug: 'guides/quickstart' },
           ],
         },
         {
-          label: "The mod namespace",
+          label: 'bf6-portal-mod-types',
           items: [
-            { label: "Overview", slug: "mod-types/overview" },
-            { label: "Events and callbacks", slug: "mod-types/events-and-enums" },
-            { label: "Players, vehicles, and objects", slug: "mod-types/interfaces" },
+            { label: 'Overview & Schemas', slug: 'mod-types/overview' },
+            { label: 'Event Handlers & Enums', slug: 'mod-types/events-and-enums' },
+            {
+              label: 'Player / Vehicle / Game Mode Interfaces',
+              slug: 'mod-types/interfaces',
+            },
           ],
         },
         {
-          label: "bf6-portal-utils",
+          label: 'bf6-portal-utils',
           items: [
-            { label: "Overview", slug: "utils/overview" },
-            { label: "Logger", slug: "utils/logger" },
-            { label: "UI", slug: "utils/ui" },
-            { label: "Events, Timers, and Clocks", slug: "utils/events-timers-clocks" },
-            { label: "Other modules", slug: "utils/other-modules" },
+            { label: 'Overview', slug: 'utils/overview' },
+            { label: 'Logic Helpers & Vector Math', slug: 'utils/logic-and-vector-math' },
+            { label: 'Rule Block Generators', slug: 'utils/rule-block-generators' },
+            { label: 'State Management Utilities', slug: 'utils/state-management' },
           ],
         },
-        typeDocSidebarGroup,
+        {
+          label: 'API Reference',
+          items: [
+            { label: 'mod-types', autogenerate: { directory: 'reference/mod-types' } },
+            { label: 'utils', autogenerate: { directory: 'reference/utils' } },
+          ],
+        },
       ],
-      lastUpdated: true,
     }),
   ],
 });

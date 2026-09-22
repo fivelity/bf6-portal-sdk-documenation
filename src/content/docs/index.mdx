@@ -1,9 +1,53 @@
 ---
 title: BF6 Portal SDK
-description: Guides and generated API reference for bf6-portal-utils, plus the global mod namespace from bf6-portal-mod-types.
+description: TypeScript documentation for bf6-portal-mod-types and bf6-portal-utils.
 template: splash
+hero:
+  tagline: Typed, verified documentation for the Battlefield 6 Portal scripting SDK — covering bf6-portal-mod-types and bf6-portal-utils.
+  actions:
+    - text: Get Started
+      link: /guides/introduction/
+      icon: right-arrow
+      variant: primary
+    - text: API Reference
+      link: /reference/mod-types/
+      icon: external
+      variant: minimal
 ---
 
-import Cover from "../../components/Cover.astro";
+import { Card, CardGrid } from '@astrojs/starlight/components';
 
-<Cover base={import.meta.env.BASE_URL.replace(/\/?$/, "/")} />
+## Two packages, one SDK
+
+<CardGrid stagger>
+	<Card title="bf6-portal-mod-types" icon="seti:typescript">
+		Type declarations for the Portal runtime — `mod.*` namespace, event
+		handler signatures, enums, and the interfaces for players, vehicles, and
+		game mode objects.
+	</Card>
+	<Card title="bf6-portal-utils" icon="setting">
+		Higher-level helpers built on top of the raw types — vector math, logic
+		helpers, rule block generators, and state management utilities for
+		writing game modes without repeating boilerplate.
+	</Card>
+</CardGrid>
+
+## Ground truth, not tutorials
+
+This site is generated directly from the installed `.d.ts` files with
+[TypeDoc](https://typedoc.org/), not hand-copied from community guides. If a
+symbol isn't in the reference, it isn't in the SDK — a distinction that matters,
+since fabricated APIs (imagined `Network` or `Input` namespaces, a `player.GetPosition()`
+that doesn't exist) circulate often enough in unofficial write-ups to trip up a build.
+
+<CardGrid>
+	<Card title="Quickstart" icon="rocket">
+		Scaffold a new game mode and deploy your first script.
+		[Read the guide →](/guides/quickstart/)
+	</Card>
+	<Card title="Architecture" icon="puzzle">
+		How mod-types and utils fit together, and the core Portal concepts
+		(events, signals, ObjIds) you need before writing rule logic.
+		[Read the guide →](/guides/architecture/)
+	</Card>
+</CardGrid>

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["node_modules/bf6-portal-utils/index.d.ts"],
+  "out": "src/content/docs/reference/utils",
+  "plugin": ["typedoc-plugin-markdown"],
+  "readme": "none",
+  "hidePageHeader": false,
+  "hideBreadcrumbs": true,
+  "useCodeBlocks": true,
+  "expandParameters": true,
+  "parametersFormat": "table",
+  "propertiesFormat": "table",
+  "enumMembersFormat": "table",
+  "typeDeclarationFormat": "table",
+  "interfacePropertiesFormat": "table",
+  "outputFileStrategy": "members",
+  "flattenOutputFiles": false,
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "excludeNotDocumented": false,
+  "sort": ["kind", "alphabetical"],
+  "gitRevision": "main",
+  "disableSources": false,
+  "sidebar": {
+    "autoConfiguration": true,
+    "pretty": true
+  },
+  "frontmatterGlobals": {
+    "editUrl": false
+  }
+}
