@@ -5,7 +5,7 @@ import starlight from '@astrojs/starlight';
 // Update `site` and `base` to match your GitHub Pages URL before deploying.
 // For a project page at https://<user>.github.io/<repo>/ set base to '/<repo>'.
 const SITE_URL = 'https://fivelity.github.io';
-const BASE_PATH = '/bf6-portal-sdk-docs';
+const BASE_PATH = '/bf6-portal-sdk-documenation';
 
 export default defineConfig({
   site: SITE_URL,
@@ -15,17 +15,17 @@ export default defineConfig({
     starlight({
       title: 'BF6 Portal SDK',
       description:
-        'Documentation for bf6-portal-mod-types and bf6-portal-utils — the TypeScript SDK for Battlefield 6 Portal custom game modes.',
+        'Documentation for bf6-portal-mod-types and bf6-portal-utils — packages based on the Official TypeScript SDK for creating Battlefield 6 Portal Experiences.',
       customCss: ['./src/styles/wardogs-theme.css'],
       social: [
         {
           icon: 'github',
           label: 'GitHub',
-          href: 'https://github.com/fivelity/bf6-portal-sdk-docs',
+          href: 'https://github.com/fivelity/bf6-portal-sdk-documenation',
         },
       ],
       editLink: {
-        baseUrl: 'https://github.com/fivelity/bf6-portal-sdk-docs/edit/main/',
+        baseUrl: 'https://github.com/fivelity/bf6-portal-sdk-documenation/edit/main/',
       },
       lastUpdated: true,
       pagination: true,

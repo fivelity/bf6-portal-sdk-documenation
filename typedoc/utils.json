@@ -22,11 +22,4 @@
   "sort": ["kind", "alphabetical"],
   "gitRevision": "main",
   "disableSources": false,
-  "sidebar": {
-    "autoConfiguration": true,
-    "pretty": true
-  },
-  "frontmatterGlobals": {
-    "editUrl": false
-  }
 }
