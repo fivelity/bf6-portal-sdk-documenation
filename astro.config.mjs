@@ -18,6 +18,9 @@ export default defineConfig({
       description:
         'Documentation for bf6-portal-mod-types and bf6-portal-utils — packages based on the Official TypeScript SDK for creating Battlefield 6 Portal Experiences.',
       customCss: ['./src/styles/wardogs-theme.css'],
+      components: {
+        Sidebar: './src/ReferenceSidebar.astro',
+      },
       social: [
         {
           icon: 'github',
@@ -79,11 +82,17 @@ export default defineConfig({
           items: [
             {
               label: 'mod-types',
-              items: [{ autogenerate: { directory: 'reference/mod-types' } }],
+              badge: { text: '431 fn · 83 enum', variant: 'note' },
+              items: [
+                { autogenerate: { directory: 'reference/mod-types', collapsed: true } },
+              ],
             },
             {
               label: 'utils',
-              items: [{ autogenerate: { directory: 'reference/utils' } }],
+              badge: { text: '21 modules', variant: 'note' },
+              items: [
+                { autogenerate: { directory: 'reference/utils', collapsed: true } },
+              ],
             },
           ],
         },
