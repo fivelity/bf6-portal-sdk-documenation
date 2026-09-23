@@ -1,52 +1,70 @@
 ---
 title: Event Handlers & Enums
-description: How Events.On* subscriptions work, and the enum patterns used across the runtime.
+description: How mod.EventHandlerSignatures works, and the enum patterns used across the runtime.
 ---
 
-## Subscribing to events
+## The raw event handler contract
 
-Every lifecycle hook in the runtime is exposed as an object on the `Events`
-namespace with a `.subscribe(handler)` method — never a raw callback
-property you assign directly.
+Every lifecycle hook the Portal runtime can call into is described by a
+function signature under `mod.EventHandlerSignatures` — **80 of them**, for
+example:
 
 ```ts
-import { Events } from 'bf6-portal-mod-types';
+// mod.EventHandlerSignatures.OnPlayerDied — the *signature*, not a callable
+function OnPlayerDied(
+  eventPlayer: mod.Player,
+  eventOtherPlayer: mod.Player,
+  eventDeathType: mod.DeathType,
+  eventWeaponUnlock: mod.WeaponUnlock,
+): void;
+```
 
-Events.OnPlayerEnterAreaTrigger.subscribe((player, trigger) => {
-  // trigger is a typed AreaTrigger reference, not a bare number
+These are **not** something you call, subscribe to, or import from
+`bf6-portal-mod-types` at runtime. They exist purely so TypeScript can check
+the shape of a handler you export. The Portal runtime scans your compiled
+mode for a same-named exported function (`OnPlayerDied`, `OngoingPlayer`,
+`OnCapturePointCaptured`, and so on) and calls it directly when that event
+fires.
+
+:::caution[Exactly one implementation per event, project-wide]
+The runtime allows **one** exported implementation of each event handler
+name per entire compiled mode. If two files in your codebase both export a
+function named `OnPlayerDied`, only one survives the build — silently. This
+is the single biggest gotcha in Portal scripting, and it's why
+`bf6-portal-utils` ships a dedicated
+[`Events` module](/utils/events/) that owns every raw handler once and
+lets the rest of your codebase subscribe to it from as many places as
+needed:
+
+```ts
+import { Events } from 'bf6-portal-utils/events';
+
+Events.OnPlayerDied.subscribe((player, killer, deathType, weaponUnlock) => {
+  // your logic — any number of subscribers here is fine
 });
 ```
 
-:::caution
-Portal allows exactly one implementation per raw event under the hood. If two
-independent modules both call `.subscribe()` expecting to layer on top of
-each other, confirm the specific event actually supports multiple listeners
-in the installed type declarations — some do, some are single-owner. When in
-doubt, route all handling for a given event through one module.
+Once you bring in `Events`, **never export a raw `OnPlayerDied` (or any
+other event name) yourself** — the module owns that hook. See
+[bf6-portal-utils → Events](/utils/events/) for the full API, including the
+async-handler and error-isolation behavior.
 :::
-
-## Common event families
-
-| Prefix | Fires on | Typical use |
-|---|---|---|
-| `OnPlayer*` | Player lifecycle — death, spawn, undeploy, zone entry/exit | Scoring, state resets, zone tracking |
-| `OnSpawner*` | AI or vehicle spawner activity | Confirming a spawn actually landed, since spawn calls don't return a usable handle |
-| `OnRayCast*` | Raycast results | Placement/aim confirmation — the raycast call itself returns `void` |
-| `Ongoing*` | Recurring ticks (e.g. every N seconds) | Zone majority tallies, timed rewards |
-
-Always confirm the exact member name and payload shape against the
-[API Reference](/reference/mod-types/) rather than assuming a name follows
-the pattern above — the table is a guide to the shape of the surface, not a
-substitute for the generated signatures.
 
 ## Enums
 
-Enums describe closed sets of runtime constants — team identifiers, state
-vector selectors passed to functions like `mod.GetSoldierState`, and similar
-fixed vocabularies. Because these are genuine TypeScript enums (not string
-literals you might mistype), referencing an invalid member is a compile
-error rather than a silent runtime failure — one of the strongest arguments
-for keeping `strict` mode on and avoiding `any` casts around SDK calls.
+Enums describe closed sets of runtime constants. The package ships **83**
+of them, including:
 
-See the [API Reference](/reference/mod-types/) for the full enum list with
-every member and its underlying value.
+| Category | Examples |
+|---|---|
+| Gameplay constants | `PlayerDeathTypes`, `PlayerDamageTypes`, `Factions`, `Gadgets`, `AmmoTypes`, `ArmorTypes` |
+| State-vector selectors | `SoldierStateVector`, `SoldierStateNumber`, `SoldierStateBool` — passed to `mod.GetSoldierState` |
+| Per-map spawn data | One `RuntimeSpawn_<MapName>` enum per official map (e.g. `RuntimeSpawn_Aftermath`, `RuntimeSpawn_Granite_Downtown`) — named identifiers for that map's runtime-spawnable props and set dressing |
+
+Because these are genuine TypeScript enums rather than string literals you
+might mistype, referencing an invalid member is a compile error rather than
+a silent runtime failure — one of the strongest arguments for keeping
+`strict` mode on.
+
+See the [API Reference](/reference/mod-types/) for the full, generated enum
+list with every member and its underlying value.

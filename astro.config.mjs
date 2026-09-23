@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import mdx from '@astrojs/mdx';
 
 // Update `site` and `base` to match your GitHub Pages URL before deploying.
 // For a project page at https://<user>.github.io/<repo>/ set base to '/<repo>'.
@@ -64,19 +65,30 @@ export default defineConfig({
           label: 'bf6-portal-utils',
           items: [
             { label: 'Overview', slug: 'utils/overview' },
-            { label: 'Logic Helpers & Vector Math', slug: 'utils/logic-and-vector-math' },
-            { label: 'Rule Block Generators', slug: 'utils/rule-block-generators' },
-            { label: 'State Management Utilities', slug: 'utils/state-management' },
+            { label: 'Vector Math', slug: 'utils/vector-math' },
+            { label: 'Events', slug: 'utils/events' },
+            { label: 'Timers & Clocks', slug: 'utils/timers-and-clocks' },
+            { label: 'UI Components', slug: 'utils/ui-components' },
+            { label: 'Solid UI (Reactive)', slug: 'utils/solid-ui' },
+            { label: 'Mod Extensions', slug: 'utils/mod-extensions' },
+            { label: 'Other Modules', slug: 'utils/other-modules' },
           ],
         },
         {
           label: 'API Reference',
           items: [
-            { label: 'mod-types', autogenerate: { directory: 'reference/mod-types' } },
-            { label: 'utils', autogenerate: { directory: 'reference/utils' } },
+            {
+              label: 'mod-types',
+              items: [{ autogenerate: { directory: 'reference/mod-types' } }],
+            },
+            {
+              label: 'utils',
+              items: [{ autogenerate: { directory: 'reference/utils' } }],
+            },
           ],
         },
       ],
     }),
+    mdx(),
   ],
 });
