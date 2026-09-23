@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "pnpm run docs:api && astro build",
+    "build": "pnpm run docs:api && astro build && node scripts/prefix-dist-base-links.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "docs:api": "pnpm run docs:api:mod-types && pnpm run docs:api:utils",
