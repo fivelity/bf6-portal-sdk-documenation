@@ -10,11 +10,12 @@
     "preview": "astro preview",
     "astro": "astro",
     "docs:api": "pnpm run docs:api:mod-types && pnpm run docs:api:utils",
-    "docs:api:mod-types": "typedoc --options typedoc/mod-types.json",
-    "docs:api:utils": "typedoc --options typedoc/utils.json",
+    "docs:api:mod-types": "typedoc --options typedoc/mod-types.json && node scripts/add-reference-frontmatter.mjs mod-types",
+    "docs:api:utils": "typedoc --options typedoc/utils.json && node scripts/add-reference-frontmatter.mjs utils",
     "typecheck": "astro check && tsc --noEmit"
   },
   "dependencies": {
+    "@astrojs/mdx": "^8.0.0",
     "@astrojs/starlight": "^0.42.2",
     "astro": "^7.3.3",
     "sharp": "^0.35.4"
