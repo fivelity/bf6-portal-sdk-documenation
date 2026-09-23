@@ -10,8 +10,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "docs:api": "pnpm run docs:api:mod-types && pnpm run docs:api:utils",
-    "docs:api:mod-types": "typedoc --options typedoc/mod-types.json && node scripts/add-reference-frontmatter.mjs mod-types && node scripts/rewrite-reference-links.mjs mod-types",
-    "docs:api:utils": "typedoc --options typedoc/utils.json && node scripts/add-reference-frontmatter.mjs utils && node scripts/rewrite-reference-links.mjs utils",
+    "docs:api:mod-types": "typedoc --options typedoc/mod-types.json && node scripts/add-reference-frontmatter.mjs mod-types && node scripts/rewrite-reference-links.mjs mod-types && node scripts/copy-curated-pages.mjs mod-types",
+    "docs:api:utils": "typedoc --options typedoc/utils.json && node scripts/add-reference-frontmatter.mjs utils && node scripts/rewrite-reference-links.mjs utils && node scripts/copy-curated-pages.mjs utils",
     "typecheck": "astro check && tsc --noEmit"
   },
   "dependencies": {
