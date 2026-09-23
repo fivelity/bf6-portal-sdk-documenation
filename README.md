@@ -32,21 +32,26 @@ Visit `http://localhost:4321`.
 
 | Script | What it does |
 |---|---|
-| `pnpm run docs:api` | Runs TypeDoc against both packages, writes markdown into `src/content/docs/reference/`, then injects Starlight frontmatter |
-| `pnpm run docs:api:mod-types` | TypeDoc for `bf6-portal-mod-types` only, then frontmatter injection for that tree |
-| `pnpm run docs:api:utils` | TypeDoc for `bf6-portal-utils` only, then frontmatter injection for that tree |
+| `pnpm run docs:api` | Full reference pipeline for both packages: TypeDoc → frontmatter injection → cross-link rewrite → curated page overlay (each step has its own section below) |
+| `pnpm run docs:api:mod-types` | The same four-step pipeline scoped to `bf6-portal-mod-types` → `src/content/docs/reference/mod-types/` |
+| `pnpm run docs:api:utils` | The same four-step pipeline scoped to `bf6-portal-utils` → `src/content/docs/reference/utils/` |
 | `pnpm run dev` | Astro dev server |
-| `pnpm run build` | Runs `docs:api`, then `astro build` → `dist/` |
-| `pnpm run preview` | Preview the production build locally |
+| `pnpm run build` | `docs:api` → `astro build` → base-prefix pass → `dist/` |
+| `pnpm run preview` | Preview the production build locally — also how to verify base-dependent links, since the prefix pass only runs inside `pnpm build` |
 | `pnpm run typecheck` | `astro check` + `tsc --noEmit` |
 
 ## Project structure
 
 ```
-├── .github/workflows/deploy-docs.yml   # CI: typedoc → typecheck → build → deploy to Pages
+├── .github/workflows/deploy-docs.yml   # CI: docs:api → typecheck → build → deploy to Pages
 ├── astro.config.mjs                     # Starlight config, curated sidebar, site/base URL
+├── curated/                             # Hand-written landing pages (source of truth)
+│   └── mod-types/                       #   mirrors the generated reference/ tree path-for-path
 ├── scripts/
-│   └── add-reference-frontmatter.mjs    # injects title/description into generated TypeDoc markdown
+│   ├── add-reference-frontmatter.mjs    # injects title/description into generated TypeDoc markdown
+│   ├── rewrite-reference-links.mjs      # .md cross-links → browser-valid page-relative URLs
+│   ├── copy-curated-pages.mjs           # overlays curated/ onto reference/ (last docs:api step)
+│   └── prefix-dist-base-links.mjs       # root-absolute body links → base-prefixed (last build step)
 ├── typedoc/
 │   ├── mod-types.json                   # TypeDoc options for bf6-portal-mod-types
 │   ├── tsconfig.mod-types.json          # scoped tsconfig TypeDoc converts against
@@ -54,12 +59,13 @@ Visit `http://localhost:4321`.
 │   └── tsconfig.utils.json              # scoped tsconfig for the utils entry points
 ├── src/
 │   ├── content.config.ts                # Starlight docs collection (content-layer loader API)
+│   ├── ReferenceSidebar.astro           # Sidebar component override (injects top-level icons)
 │   ├── styles/wardogs-theme.css         # Custom Starlight theme (manifest palette)
 │   └── content/docs/
 │       ├── guides/                      # Getting Started section
 │       ├── mod-types/                   # Conceptual docs for bf6-portal-mod-types
 │       ├── utils/                       # Conceptual docs for bf6-portal-utils
-│       └── reference/                   # Auto-generated — do not hand-edit
+│       └── reference/                   # Auto-generated + curated overlay — never hand-edit
 └── package.json
 ```
 
@@ -114,11 +120,60 @@ Starlight's `docsSchema()` requires every page to have a `title` string, or
 the build fails. `scripts/add-reference-frontmatter.mjs` runs immediately
 after each `docs:api:*` TypeDoc invocation and prepends `title`/
 `description`/`editUrl: false`, derived from that page's own `#` heading.
-It's idempotent-safe: it skips any file that already starts with `---`
-(which lets you drop a genuinely hand-curated file into `reference/` — e.g.
-a directory's `index.md` — and it won't be clobbered, though nothing in
-this repo currently does that, since the sidebar's curated groups make a
-hand-written reference index unnecessary).
+It's idempotent-safe: it skips any file that already starts with `---`.
+
+## Curated landing pages (why they live in `curated/`, not `reference/`)
+
+TypeDoc's `cleanOutputDir` (on by default) wipes its entire output
+directory on every `docs:api` run, and `.gitignore` whitelists only the
+two entry `index.md` files under `reference/` — so a hand-written page
+placed inside `reference/` would be deleted by the next run, or exist in
+git as an unreviewable orphan.
+
+Hand-written landing pages therefore live in **`curated/`**, mirroring
+the generated tree path-for-path, and `scripts/copy-curated-pages.mjs`
+runs **last** in each `docs:api` chain, copying them over their generated
+counterparts — curated content always wins without anyone editing a
+generated file in place. Curated files carry their own frontmatter
+(`title`/`description`/`editUrl`); the frontmatter script never sees
+them because it runs earlier in the chain, and their `editUrl` points at
+the tracked `curated/` source so the site's Edit link never lands on a
+gitignored copy.
+
+Six pages exist today: the `reference/mod-types/` root landing plus
+per-category landings for `mod/functions`, `mod/enumerations`,
+`mod/type-aliases`, `mod/variables`, and
+`mod/namespaces/EventHandlerSignatures/functions`. **To edit one, edit
+`curated/**` (never `reference/**`) and re-run `pnpm run docs:api`** —
+the run also refreshes the tracked root
+`reference/mod-types/index.md` copy, keeping git clean.
+
+## How cross-links survive two incompatible URL schemes
+
+Two link shapes in this repo cannot ship as-authored:
+
+1. **TypeDoc's relative `.md` cross-links** (`../type-aliases/Vector.md`)
+   resolve from the markdown *source* file, but Astro serves each file
+   as a directory route one level deeper than the source sits, lowercased
+   and without the `.md` extension — wrong depth, extension, *and* case,
+   so all ~3,400 generated links 404'd.
+   `scripts/rewrite-reference-links.mjs` (the third `docs:api` step)
+   resolves each link's target on disk, maps both endpoints to their
+   final route paths, and rewrites to a page-relative URL like
+   `../../type-aliases/vector/`. Page-relative links can't break if
+   `base` changes; `#anchors` are preserved, fenced code blocks are
+   skipped, and re-running is a no-op.
+2. **Root-absolute body links** (`](/mod-types/events-and-enums/)`).
+   Astro/Starlight only applies `base` to navigation, sidebar, and config
+   links — root-relative links written in markdown body content pass
+   through untouched and resolve against the *site root*, 404ing on the
+   GitHub project page. `scripts/prefix-dist-base-links.mjs` (the last
+   `pnpm build` step) rewrites every root-relative `href`/`src` in
+   `dist/` HTML, prefixing the base it imports from `astro.config.mjs`.
+
+Because both fixes are pipeline steps, never hand-patch a broken link in
+`reference/` — the next `docs:api` overwrites it. Fix the script (or the
+hand-authored source page outside `reference/`) instead.
 
 ## Maintaining the curated sidebar
 
@@ -144,16 +199,34 @@ own object). This means:
   added to the matching hand-curated group in `astro.config.mjs` — these
   groups are not autogenerated, by design, so their order and grouping stay
   under editorial control.
+- **Category landing pages** come from `curated/` (see above) and appear
+  in the sidebar automatically — `autogenerate` picks them up like any
+  other generated `index.md`.
+- **Icons**: Starlight 0.42's sidebar schema has no `icon` field, so
+  `src/ReferenceSidebar.astro` (wired through `components.Sidebar` in
+  `astro.config.mjs`) wraps the default `Sidebar` and injects an icon
+  next to each **top-level** entry, keyed by that entry's exact label
+  text. Renaming a top-level sidebar label means updating `ICON_BY_LABEL`
+  in that component; labels without a mapping simply get no icon.
+- **Index pages sort first automatically**: within an autogenerated
+  directory, an `index.md` sorts ahead of its siblings because its route
+  id is a strict prefix of theirs — no `sidebar.order` needed. Do *not*
+  add `sidebar.order` to a curated page to force placement: a
+  directory's position is the minimum order across its children, so it
+  would silently reorder the whole sibling group.
 
 ## Updating SDK versions
 
 Bump `bf6-portal-mod-types` / `bf6-portal-utils` in `package.json`, reinstall,
 and re-run `pnpm run docs:api` — the API Reference section regenerates
-entirely from whatever version is installed. Conceptual guide pages under
-`guides/`, `mod-types/`, and `utils/` are hand-written against the verified
-real API and won't auto-update — re-verify any code sample against the new
-`.d.ts` / module README before assuming it still compiles, since this SDK
-has changed its actual API surface across versions before.
+entirely from whatever version is installed, and the `curated/` landing
+pages are re-overlaid untouched by the same run. Conceptual guide pages
+under `guides/`, `mod-types/`, and `utils/`, the `curated/` pages, and
+any prose that names specific symbols are hand-written against the
+verified real API and won't auto-update — re-verify any code sample or
+symbol claim against the new `.d.ts` / module README before assuming it
+still compiles, since this SDK has changed its actual API surface across
+versions before.
 
 ## Deploying to GitHub Pages
 
@@ -170,8 +243,10 @@ has changed its actual API surface across versions before.
 
 ## Notes on accuracy
 
-Every API Reference page is generated directly from the installed package's
-type declarations — nothing under `reference/` is hand-transcribed. Every
+Every API Reference **symbol** page is generated directly from the
+installed package's type declarations — nothing under `reference/` is
+hand-transcribed (the six curated landing pages are authored in
+`curated/` and overlaid by the pipeline, as described above). Every
 conceptual guide page elsewhere on this site was written against the real
 `.d.ts` files and in-package module READMEs, pulled from the actual
 published npm packages, not recalled from memory or copied from
