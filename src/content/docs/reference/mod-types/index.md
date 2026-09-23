@@ -14,10 +14,10 @@ editUrl: false
 
 | Namespace | Description |
 | ------ | ------ |
-| [mod](bf6-portal-mod-types/namespaces/mod/index.md) | - |
+| [mod](bf6-portal-mod-types/namespaces/mod/) | - |
 
 ## Variables
 
 | Variable | Description |
 | ------ | ------ |
-| [console](variables/console.md) | - |
+| [console](variables/console/) | - |
