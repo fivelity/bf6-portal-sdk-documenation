@@ -1,30 +1,44 @@
 ---
 title: Quickstart Guide
-description: Scaffold a minimal Portal mode using bf6-portal-mod-types and bf6-portal-utils together.
+description: Scaffold a minimal, fully-typed Portal mode using bf6-portal-mod-types and bf6-portal-utils together.
 ---
 
 This walks through a minimal but complete mode script: a kill-reward system
-that logs cash and XP gains to an on-screen dashboard, entirely typed, with
-no `any`.
+that pays out cash and XP, fully typed, with no `any`. Every snippet below
+was compiled against `bf6-portal-mod-types@4.3.0` and
+`bf6-portal-utils@9.4.0` under `strict` mode.
 
 ## 1. Project layout
 
-```
+```code
 my-mode/
 ├── src/
 │   ├── config/
 │   │   └── ids.ts       # ObjId constants — the only place numeric IDs live
 │   ├── player/
-│   │   └── state.ts     # per-player custom state shape
-│   └── index.ts          # event wiring / rule logic entry point
+│   │   └── state.ts     # per-player custom state
+│   └── mode.ts          # event wiring / rule logic
 ├── package.json
 └── tsconfig.json
 ```
 
-## 2. Define player state
+## 2. Centralize ObjIds
+
+Every `CapturePoint`, `AreaTrigger`, and `WorldIcon` is an integer that must
+match an object placed in your level's scene data. Keep them in one file.
+
+```ts title="src/config/ids.ts"
+export const ObjIds = {
+  controlZoneTrigger: 900,
+  controlZoneCapture: 9000,
+} as const;
+```
+
+## 3. Define player state
 
 Portal has no native currency or XP primitive — both are custom state you
-attach to each connected player.
+attach per player. `mod.Player` is **opaque** and has no `.id` property, so
+key your state by `mod.GetObjId(player)`.
 
 ```ts title="src/player/state.ts"
 export interface ModePlayerState {
@@ -38,7 +52,7 @@ const playerState = new Map<number, ModePlayerState>();
 export function getOrCreateState(player: mod.Player): ModePlayerState {
   const playerId = mod.GetObjId(player);
   const existing = playerState.get(playerId);
-  if (existing) return existing;
+  if (existing !== undefined) return existing;
 
   const created: ModePlayerState = { playerId, wallet: 10_000, assaultXp: 0 };
   playerState.set(playerId, created);
@@ -46,88 +60,45 @@ export function getOrCreateState(player: mod.Player): ModePlayerState {
 }
 ```
 
-Note `mod.GetObjId(player)` for the map key — `mod.Player` is an opaque
-type with no `.id` property, so this is the only stable way to key a `Map`
-by player.
+## 4. Wire the event
 
-## 3. Wire the event through `Events`, never a raw export
+Subscribe through the `Events` bus from `bf6-portal-utils`. In
+`OnPlayerEarnedKill`, the **first** argument is the player who earned the
+kill; the second is the victim.
 
-```ts title="src/index.ts"
+```ts title="src/mode.ts"
 import { Events } from 'bf6-portal-utils/events';
-import { Logger } from 'bf6-portal-utils/logger';
 import { getOrCreateState } from './player/state';
 
 const KILL_CASH_REWARD = 500;
 const KILL_XP_REWARD = 150;
 
-const dashboard = new Map<number, Logger>();
-
-function getOrCreateDashboard(player: mod.Player): Logger {
-  const playerId = mod.GetObjId(player);
-  const existing = dashboard.get(playerId);
-  if (existing) return existing;
-
-  const created = new Logger(player, { staticRows: false });
-  dashboard.set(playerId, created);
-  return created;
-}
-
-Events.OnPlayerDied.subscribe((victim, killer) => {
-  if (mod.Equals(victim, killer)) return; // suicide, no reward
-
-  const killerState = getOrCreateState(killer);
-  killerState.wallet += KILL_CASH_REWARD;
-  killerState.assaultXp += KILL_XP_REWARD;
-
-  getOrCreateDashboard(killer).log(`+$${KILL_CASH_REWARD} / +${KILL_XP_REWARD} XP`);
+Events.OnPlayerEarnedKill.subscribe((killer, _victim, _deathType, _weaponUnlock) => {
+  const state = getOrCreateState(killer);
+  state.wallet += KILL_CASH_REWARD;
+  state.assaultXp += KILL_XP_REWARD;
 });
 ```
 
-Two things matter here:
+:::caution[Never export a raw handler]
+Portal allows exactly **one** implementation per event name across your whole
+compiled mode. Once you use `Events`, do not also `export function
+OnPlayerEarnedKill(...)` anywhere — see
+[Single-owner event handlers](/guides/architecture/#single-owner-event-handlers).
+:::
 
-- **Import `Events` from `bf6-portal-utils/events`**, not a bare `export
-  function OnPlayerDied(...)`. Portal allows only one exported
-  implementation of each raw handler name per compiled mode — see
-  [Single-owner event handlers](/guides/architecture/#single-owner-event-handlers)
-  for why a second raw handler anywhere else in your codebase would
-  silently break this one.
-- **`console.log` only writes to a file on PC** and isn't visible on
-  console platforms at all. `Logger` (from `bf6-portal-utils/logger`)
-  renders text as an actual in-game UI element instead, so it works
-  everywhere. See [UI Components](/utils/ui-components/) for the full
-  `Logger` API.
-
-## 4. Type-check before deploying
+## 5. Type-check
 
 ```bash
 pnpm exec tsc --noEmit
 ```
 
-A clean run means every symbol you referenced — `Events.OnPlayerDied`,
-`mod.GetObjId`, `Logger`, and so on — actually exists in the
-installed SDK version. If something doesn't compile, check the
-[API Reference](/reference/mod-types/) for the real signature rather than
-guessing.
+If something doesn't compile, check the [API Reference](/reference/mod-types/)
+for the real signature rather than guessing.
 
-## 5. Bundle for deployment
+## Where next
 
-Portal expects a single script file, not a module graph. The community
-[`bf6-portal-bundler`](https://www.npmjs.com/package/bf6-portal-bundler)
-tool (referenced throughout the `bf6-portal-utils` module READMEs) inlines
-your imports — including any `bf6-portal-utils` modules you used — into one
-file, and merges any per-module `strings.json` fragments a module like
-`Logger` ships with:
-
-```bash
-pnpm add -D bf6-portal-bundler
-pnpm exec bf6-portal-bundler src/index.ts
-```
-
-## Where to go next
-
-- [bf6-portal-mod-types → Event Handlers & Enums](/mod-types/events-and-enums/)
-  for the full list of available events
-- [bf6-portal-utils → Events](/utils/events/) for the subscription API this
-  guide relies on
-- [bf6-portal-utils → Timers & Clocks](/utils/timers-and-clocks/) for
-  `setTimeout`-style scheduling, since QuickJS has no native timers
+- [Event Handlers & Enums](/mod-types/events-and-enums/) — how the runtime
+  calls into your code
+- [Timers & Clocks](/utils/timers-and-clocks/) — scheduling on top of `mod.Wait`
+- [UI Components](/utils/ui-components/) — building menus and HUD

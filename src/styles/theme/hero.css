@@ -1,0 +1,106 @@
+/* ==========================================================================
+   WARDOGS THEME — 05 · HERO / SPLASH
+   Manifest hero: eyebrow rule, huge condensed display title, mono stat
+   strip, scanline HUD frame.
+   ========================================================================== */
+
+[data-has-hero] .hero {
+  padding-block: clamp(2.5rem, 7vw, 5rem) clamp(2rem, 5vw, 3.5rem);
+  border-bottom: var(--wd-rule);
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+/* Eyebrow: mono, brass, with leading rule */
+[data-has-hero] .hero .copy::before {
+  content: var(--wd-hero-eyebrow, 'Battlefield 6 Portal · SDK Reference');
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--wd-font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wd-brass);
+}
+
+[data-has-hero] .hero h1 {
+  font-family: var(--wd-font-display);
+  font-weight: 800;
+  font-size: clamp(3.4rem, 9vw, 6.75rem);
+  line-height: 0.86;
+  letter-spacing: 0.005em;
+  color: var(--sl-color-white);
+  text-transform: uppercase;
+}
+
+[data-has-hero] .hero .tagline {
+  max-width: 52ch;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--wd-paper-dim);
+}
+
+/* Hero actions: square plates instead of pills */
+[data-has-hero] .hero .sl-link-button {
+  border-radius: var(--wd-radius);
+  font-family: var(--wd-font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.8em 1.4em;
+  border: 1px solid var(--wd-hairline-strong);
+  transition:
+    background var(--wd-fast) var(--wd-ease),
+    border-color var(--wd-fast) var(--wd-ease),
+    color var(--wd-fast) var(--wd-ease);
+}
+[data-has-hero] .hero .sl-link-button.primary {
+  background: var(--wd-brass);
+  border-color: var(--wd-brass);
+  color: #100f0c;
+}
+[data-has-hero] .hero .sl-link-button.primary:hover {
+  background: var(--wd-brass-bright);
+  border-color: var(--wd-brass-bright);
+}
+[data-has-hero] .hero .sl-link-button.secondary,
+[data-has-hero] .hero .sl-link-button.minimal {
+  background: transparent;
+  color: var(--sl-color-white);
+}
+[data-has-hero] .hero .sl-link-button.secondary:hover,
+[data-has-hero] .hero .sl-link-button.minimal:hover {
+  border-color: var(--wd-brass);
+  color: var(--wd-brass-bright);
+}
+
+/* Landing body: give h2s the manifest section rhythm */
+[data-has-hero] .sl-markdown-content h2 {
+  border-bottom: var(--wd-rule);
+}
+
+/* ---------- Decorative HUD frame (opt-in: <div class="wd-hud">…) ---------- */
+.wd-hud {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: var(--wd-rule-strong);
+  background: linear-gradient(155deg, #1a1712, #0d0c09 70%);
+}
+.wd-hud::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  background: repeating-linear-gradient(
+    0deg,
+    var(--wd-scanline) 0,
+    var(--wd-scanline) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}

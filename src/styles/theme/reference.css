@@ -1,0 +1,73 @@
+/* ==========================================================================
+   WARDOGS THEME — 06 · API REFERENCE
+   typedoc-plugin-markdown emits dense parameter tables, long signatures and
+   deep heading trees. These rules keep them scannable.
+   Pages under /reference/ are tagged by the MarkdownContent override, which
+   sets `data-section="reference"` on `.sl-markdown-content`.
+   ========================================================================== */
+
+/* Tighter rhythm: reference pages are lookup tables, not prose */
+[data-section='reference'] {
+  --sl-content-gap-y: 0.8rem;
+}
+
+/* Headings in generated pages are symbol names → mono, not display */
+[data-section='reference'] h2,
+[data-section='reference'] h3,
+[data-section='reference'] h4 {
+  font-family: var(--wd-font-mono);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.25;
+  word-break: break-word;
+}
+[data-section='reference'] h2 {
+  font-size: 1.3rem;
+}
+[data-section='reference'] h3 {
+  font-size: 1.08rem;
+  color: var(--wd-brass-bright);
+}
+[data-section='reference'] h4 {
+  font-size: 0.92rem;
+}
+[data-section='reference'] h5 {
+  margin-top: 1.4rem;
+}
+
+/* Parameter / property tables: compact, mono first column */
+[data-section='reference'] table {
+  font-size: 0.84rem;
+}
+[data-section='reference'] td:first-child code,
+[data-section='reference'] td:first-child {
+  font-family: var(--wd-font-mono);
+  font-size: 0.82rem;
+  color: var(--wd-brass-bright);
+}
+[data-section='reference'] td {
+  padding-block: 0.55rem;
+}
+
+/* Signature blocks */
+[data-section='reference'] .expressive-code {
+  margin-block: 0.75rem;
+}
+
+/* Breadcrumb-style "Defined in" / "Returns" lines */
+[data-section='reference'] p > em:only-child {
+  font-family: var(--wd-font-mono);
+  font-size: 0.72rem;
+  color: var(--wd-muted);
+}
+
+/* Deprecated / experimental markers TypeDoc emits as blockquotes */
+[data-section='reference'] blockquote {
+  font-size: 0.86rem;
+  border-inline-start-color: var(--wd-hairline-strong);
+}
+
+/* Long enum lists (83 enums × many members): let tables breathe horizontally */
+[data-section='reference'] table {
+  max-width: 100%;
+}

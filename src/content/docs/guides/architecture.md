@@ -47,7 +47,7 @@ generated straight from it. A few real vs. commonly-assumed distinctions
 worth knowing up front:
 
 | Real API | Common mistake |
-|---|---|
+| --- | --- |
 | `mod.GetObjId(player)` for a stable ID, `mod.Equals(a, b)` to compare | `player.id`, `player === otherPlayer` — `Player` is opaque, it has no properties to read directly |
 | `mod.CreateVector(x, y, z)` | `new mod.Vector(x, y, z)` — `Vector` is an opaque type, not a constructible class |
 | `mod.RayCast(...)` returns `void`; results arrive via `OnRayCastHit` / `OnRayCastMissed` | Assuming the call itself returns a hit result synchronously |

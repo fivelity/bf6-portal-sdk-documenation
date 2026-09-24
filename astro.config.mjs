@@ -1,12 +1,13 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import mdx from '@astrojs/mdx';
 
 // Update `site` and `base` to match your GitHub Pages URL before deploying.
 // For a project page at https://<user>.github.io/<repo>/ set base to '/<repo>'.
+// NOTE: the repo slug below is spelled exactly as on GitHub ("documenation").
 const SITE_URL = 'https://fivelity.github.io';
 const BASE_PATH = '/bf6-portal-sdk-documenation';
+const REPO_URL = 'https://github.com/fivelity/bf6-portal-sdk-documenation';
 
 export default defineConfig({
   site: SITE_URL,
@@ -17,32 +18,39 @@ export default defineConfig({
       title: 'BF6 Portal SDK',
       description:
         'Documentation for bf6-portal-mod-types and bf6-portal-utils — packages based on the Official TypeScript SDK for creating Battlefield 6 Portal Experiences.',
-      customCss: ['./src/styles/wardogs-theme.css'],
-      components: {
-        Sidebar: './src/ReferenceSidebar.astro',
-      },
-      social: [
-        {
-          icon: 'github',
-          label: 'GitHub',
-          href: 'https://github.com/fivelity/bf6-portal-sdk-documenation',
-        },
-      ],
-      editLink: {
-        baseUrl: 'https://github.com/fivelity/bf6-portal-sdk-documenation/edit/main/',
-      },
+      favicon: '/favicon.svg',
       lastUpdated: true,
       pagination: true,
-      favicon: '/favicon.svg',
+      social: [{ icon: 'github', label: 'GitHub', href: REPO_URL }],
+      editLink: { baseUrl: `${REPO_URL}/edit/main/` },
+
+      // Order matters: fonts first, then the theme entry.
+      // Fontsource variable fonts are self-hosted → no third-party request.
+      customCss: [
+        '@fontsource-variable/big-shoulders-display',
+        '@fontsource-variable/inter',
+        '@fontsource-variable/jetbrains-mono',
+        './src/styles/wardogs-theme.css',
+      ],
+
+      components: {
+        Head: './src/components/Head.astro',
+        MarkdownContent: './src/components/MarkdownContent.astro',
+      },
+
+      // Warm Gruvbox syntax themes sit naturally next to the brass palette.
       expressiveCode: {
-        themes: ['github-dark', 'github-light'],
+        themes: ['gruvbox-dark-hard', 'gruvbox-light-hard'],
+        useStarlightUiThemeColors: false,
         styleOverrides: {
           borderRadius: '2px',
           codeFontFamily:
-            "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
+            "'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
           codeFontSize: '0.85rem',
+          uiFontFamily: "'Inter Variable', 'Inter', system-ui, sans-serif",
         },
       },
+
       sidebar: [
         {
           label: 'Getting Started',
@@ -58,10 +66,7 @@ export default defineConfig({
           items: [
             { label: 'Overview & Schemas', slug: 'mod-types/overview' },
             { label: 'Event Handlers & Enums', slug: 'mod-types/events-and-enums' },
-            {
-              label: 'Player / Vehicle / Game Mode Interfaces',
-              slug: 'mod-types/interfaces',
-            },
+            { label: 'Player / Vehicle / Game Mode Interfaces', slug: 'mod-types/interfaces' },
           ],
         },
         {
@@ -98,6 +103,5 @@ export default defineConfig({
         },
       ],
     }),
-    mdx(),
   ],
 });

@@ -8,12 +8,12 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "jsx": "preserve",
-    "ignoreDeprecations": "5.0",
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": [".astro/types.d.ts", "src/**/*", "typedoc/**/*.ts"],
+  "include": [".astro/types.d.ts", "src/**/*", "typedoc/**/*.ts", "astro.config.mjs", "astro.config.mjs", "astro.config.mjs"],
   "exclude": ["dist", "node_modules"]
 }

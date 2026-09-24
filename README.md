@@ -31,7 +31,7 @@ Visit `http://localhost:4321`.
 ## Scripts
 
 | Script | What it does |
-|---|---|
+| --- | --- |
 | `pnpm run docs:api` | Full reference pipeline for both packages: TypeDoc → frontmatter injection → cross-link rewrite → curated page overlay (each step has its own section below) |
 | `pnpm run docs:api:mod-types` | The same four-step pipeline scoped to `bf6-portal-mod-types` → `src/content/docs/reference/mod-types/` |
 | `pnpm run docs:api:utils` | The same four-step pipeline scoped to `bf6-portal-utils` → `src/content/docs/reference/utils/` |
@@ -234,10 +234,12 @@ versions before.
    Actions**.
 2. Edit `SITE_URL` and `BASE_PATH` at the top of `astro.config.mjs` to match
    your GitHub username/org and repo name:
+
    ```js
    const SITE_URL = 'https://<your-username>.github.io';
    const BASE_PATH = '/<your-repo-name>';
    ```
+
 3. Push to `main`. The `deploy-docs.yml` workflow builds and deploys
    automatically.
 
