@@ -11,7 +11,7 @@ compile error — it produces a mode that silently misbehaves at runtime.
 
 The Portal runtime scans your compiled mode for exported functions matching
 an event handler name (`OnPlayerDied`, `OngoingPlayer`,
-`OnCapturePointCaptured`, and 77 others under
+`OnCapturePointCaptured`, and 76 others under
 `mod.EventHandlerSignatures`) and calls them directly when that event
 fires. It allows **exactly one exported implementation of each handler name
 per compiled mode**. If two files in your codebase both export a function

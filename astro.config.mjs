@@ -35,6 +35,7 @@ export default defineConfig({
 
       components: {
         Head: './src/components/Head.astro',
+        Sidebar: './src/components/ReferenceSidebar.astro',
         MarkdownContent: './src/components/MarkdownContent.astro',
       },
 
@@ -79,6 +80,8 @@ export default defineConfig({
             { label: 'UI Components', slug: 'utils/ui-components' },
             { label: 'Solid UI (Reactive)', slug: 'utils/solid-ui' },
             { label: 'Mod Extensions', slug: 'utils/mod-extensions' },
+            { label: 'Module Usage Examples', slug: 'utils/module-examples' },
+            { label: 'State & Rule Patterns', slug: 'utils/state-and-rules' },
             { label: 'Other Modules', slug: 'utils/other-modules' },
           ],
         },

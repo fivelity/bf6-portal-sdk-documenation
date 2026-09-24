@@ -6,7 +6,7 @@ description: How mod.EventHandlerSignatures works, and the enum patterns used ac
 ## The raw event handler contract
 
 Every lifecycle hook the Portal runtime can call into is described by a
-function signature under `mod.EventHandlerSignatures` — **80 of them**, for
+function signature under `mod.EventHandlerSignatures` — **79 of them**, for
 example:
 
 ```ts

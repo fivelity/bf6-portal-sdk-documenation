@@ -6,17 +6,23 @@ description: The opaque object types — players, vectors, objects — and how t
 ## Opaque types
 
 Every core runtime reference in `bf6-portal-mod-types` — `Player`,
-`Vehicle`, `Vector`, `Object` — is declared as an **opaque type**:
+`Vehicle`, `Vector`, and dozens of others — is declared as an **opaque
+branded type**: an object whose only member is a private `_opaque` tag
+typed against a per-type `unique symbol`:
 
 ```ts
-// The real declaration, from types.d.ts
-type Player = object;
+// The real declarations, from types.d.ts
+type Player = { _opaque: typeof PlayerSymbol };
+type Vector = { _opaque: typeof VectorSymbol };
+type Vehicle = { _opaque: typeof VehicleSymbol };
 ```
 
-There is nothing to destructure or inspect directly. Each opaque type
-carries a private `_opaque` brand property purely to stop TypeScript from
-treating two different opaque types as interchangeable — it has no runtime
-meaning and you never touch it.
+There is nothing to destructure or inspect directly. The `_opaque` brand
+exists purely so TypeScript won't treat two different opaque types as
+interchangeable (a `Vector` is not assignable to a `Player`) — it has no
+runtime meaning and you never touch it. See the
+[Variables reference](/reference/mod-types/bf6-portal-mod-types/namespaces/mod/variables/)
+for the symbol constants.
 
 ## `mod.Player`
 
@@ -45,7 +51,7 @@ exists — it doesn't, on `Player` or on any other opaque type in this SDK.
 `Vector` follows the same pattern:
 
 ```ts
-type Vector = object; // opaque — build with mod.CreateVector, read with mod.Equals
+type Vector = { _opaque: typeof VectorSymbol }; // opaque — build with mod.CreateVector
 ```
 
 - **Build** one with `mod.CreateVector(x, y, z)` — X is left/right
@@ -68,14 +74,19 @@ page for the full API.
 
 ## `mod.Object`
 
-`Object` is the base opaque type that scene entities — capture points, area
-triggers, spawners, world icons — resolve to when you read them with
-`mod.GetObjId`. Every one of those entities is an integer ObjId that must
-match something actually placed in the level's scene data; there's no way
-for the type system to validate that a given integer literal is valid for a
-specific map, so a stale or typo'd ObjId fails at runtime, not at compile
-time. Centralize ObjIds in one config module rather than inlining numeric
-literals throughout your mode.
+`mod.Object` is a **union** of the opaque scene-entity types — capture
+points, area triggers, spawners, world icons, players, vehicles, and so on
+(see its declaration in the
+[Type Aliases reference](/reference/mod-types/bf6-portal-mod-types/namespaces/mod/type-aliases/)).
+Functions that accept "any placed thing" — `mod.GetObjId` and
+`mod.GetObjectPosition` among them — take a `mod.Object`.
+
+`mod.GetObjId(object)` returns the **numeric** ObjId. That integer must
+match something actually placed in the level's scene data; the type system
+cannot validate that a given literal is valid for a specific map, so a
+stale or typo'd ObjId fails at runtime, not at compile time. Centralize
+ObjIds in one config module rather than inlining numeric literals
+throughout your mode.
 
 ## Where types come from
 

@@ -20,17 +20,19 @@ let healthCheckInterval: number | undefined;
 
 Timers.setLogging((text) => console.log(text), Timers.LogLevel.Error);
 
+// Log the live player count every 5 seconds
 healthCheckInterval = Timers.setInterval(() => {
-  const players = mod.GetPlayers();
-  console.log(`Active players: ${players.length}`);
+  console.log(`Active players: ${mod.CountOf(mod.AllPlayers())}`);
 }, 5_000);
 
-const respawnTimeout = Timers.setTimeout(() => {
-  mod.SpawnPlayer(victim, mod.GetRandomSpawnPoint(mod.GetTeam(victim)));
+// Run something once, 10 seconds from now
+const announceTimeout = Timers.setTimeout(() => {
+  console.log('10 seconds elapsed');
 }, 10_000);
 
 // `clearTimeout`, `clearInterval`, and `clear` are all equivalent
-Timers.clear(respawnTimeout);
+Timers.clear(announceTimeout);
+if (healthCheckInterval !== undefined) Timers.clear(healthCheckInterval);
 ```
 
 Over calling `mod.Wait()` directly, `Timers` gives you:

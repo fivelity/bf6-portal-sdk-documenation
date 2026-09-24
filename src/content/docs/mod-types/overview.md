@@ -19,7 +19,7 @@ namespace:
 - **`mod.*` functions** — **431 functions** covering everything from vector
   math (`mod.CreateVector`) to player state (`mod.GetSoldierState`) to
   spawning, UI, sound, and raycasting.
-- **`mod.EventHandlerSignatures.*`** — **80 function signatures**
+- **`mod.EventHandlerSignatures.*`** — **79 function signatures**
   describing every lifecycle hook the runtime can call into your mode
   (`OnPlayerDied`, `OngoingPlayer`, `OnCapturePointCaptured`, and so on).
   These are signatures the runtime expects you to export, not something you

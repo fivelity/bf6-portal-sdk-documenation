@@ -1,14 +1,16 @@
 ---
-title: "bf6-portal-utils"
-description: "bf6-portal-utils API reference: bf6-portal-utils."
-editUrl: false
+title: bf6-portal-utils
+description: API reference for the 21 bf6-portal-utils modules — each imported from its own subpath, generated from the package's .d.ts files.
+editUrl: https://github.com/fivelity/bf6-portal-sdk-documenation/edit/main/curated/utils/index.md
 ---
 
-**bf6-portal-utils**
+`bf6-portal-utils` has no root export: each module is imported from its own
+subpath (for example `bf6-portal-utils/events`). Every page below is
+generated from the installed package's type declarations.
 
-***
-
-# bf6-portal-utils
+For narrative guides and code samples see the
+[Overview](/utils/overview/), [Module Usage Examples](/utils/module-examples/),
+and [State & Rule Patterns](/utils/state-and-rules/).
 
 ## Modules
 

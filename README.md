@@ -42,8 +42,8 @@ Visit `http://localhost:4321`.
 
 ## Project structure
 
-```code
-├── .github/workflows/deploy-docs.yml    # CI: docs:api → typecheck → build → deploy to Pages
+```
+├── .github/workflows/deploy-docs.yml   # CI: docs:api → typecheck → build → deploy to Pages
 ├── astro.config.mjs                     # Starlight config, curated sidebar, site/base URL
 ├── curated/                             # Hand-written landing pages (source of truth)
 │   └── mod-types/                       #   mirrors the generated reference/ tree path-for-path
@@ -59,7 +59,7 @@ Visit `http://localhost:4321`.
 │   └── tsconfig.utils.json              # scoped tsconfig for the utils entry points
 ├── src/
 │   ├── content.config.ts                # Starlight docs collection (content-layer loader API)
-│   ├── ReferenceSidebar.astro           # Sidebar component override (injects top-level icons)
+│   ├── components/                      # Starlight overrides: Head, MarkdownContent, ReferenceSidebar
 │   ├── styles/wardogs-theme.css         # Custom Starlight theme (manifest palette)
 │   └── content/docs/
 │       ├── guides/                      # Getting Started section
@@ -140,7 +140,7 @@ them because it runs earlier in the chain, and their `editUrl` points at
 the tracked `curated/` source so the site's Edit link never lands on a
 gitignored copy.
 
-Six pages exist today: the `reference/mod-types/` root landing plus
+Seven pages exist today: the `reference/utils/` root landing (`curated/utils/index.md`), the `reference/mod-types/` root landing plus
 per-category landings for `mod/functions`, `mod/enumerations`,
 `mod/type-aliases`, `mod/variables`, and
 `mod/namespaces/EventHandlerSignatures/functions`. **To edit one, edit
@@ -203,7 +203,7 @@ own object). This means:
   in the sidebar automatically — `autogenerate` picks them up like any
   other generated `index.md`.
 - **Icons**: Starlight 0.42's sidebar schema has no `icon` field, so
-  `src/ReferenceSidebar.astro` (wired through `components.Sidebar` in
+  `src/components/ReferenceSidebar.astro` (wired through `components.Sidebar` in
   `astro.config.mjs`) wraps the default `Sidebar` and injects an icon
   next to each **top-level** entry, keyed by that entry's exact label
   text. Renaming a top-level sidebar label means updating `ICON_BY_LABEL`
@@ -214,6 +214,13 @@ own object). This means:
   add `sidebar.order` to a curated page to force placement: a
   directory's position is the minimum order across its children, so it
   would silently reorder the whole sibling group.
+
+## Requirements and dev-mode caveat
+
+Node **24+** is required (`bf6-portal-utils` declares `>=24`; Astro 7 needs
+`>=22.12`). Body links like `/utils/events/` are only base-prefixed by
+`pnpm build`, so under `pnpm dev` they resolve against the site root; use
+`pnpm build && pnpm preview` to verify links.
 
 ## Updating SDK versions
 

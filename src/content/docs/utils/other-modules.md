@@ -4,7 +4,8 @@ description: Raycast, Sounds, PortalGadget, PerformanceStats, MapDetector, and t
 ---
 
 The modules below round out `bf6-portal-utils`. Each is self-contained and
-imported by its own subpath — see the
+imported by its own subpath — see
+[Module Usage Examples](/utils/module-examples/) for code and the
 [API Reference → utils](/reference/utils/) for full generated signatures.
 
 ## Raycast — `bf6-portal-utils/raycast`
