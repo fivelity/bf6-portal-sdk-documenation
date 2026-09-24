@@ -56,7 +56,7 @@ Enums describe closed sets of runtime constants. The package ships **83**
 of them, including:
 
 | Category | Examples |
-|---|---|
+| --- | --- |
 | Gameplay constants | `PlayerDeathTypes`, `PlayerDamageTypes`, `Factions`, `Gadgets`, `AmmoTypes`, `ArmorTypes` |
 | State-vector selectors | `SoldierStateVector`, `SoldierStateNumber`, `SoldierStateBool` — passed to `mod.GetSoldierState` |
 | Per-map spawn data | One `RuntimeSpawn_<MapName>` enum per official map (e.g. `RuntimeSpawn_Aftermath`, `RuntimeSpawn_Granite_Downtown`) — named identifiers for that map's runtime-spawnable props and set dressing |
