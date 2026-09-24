@@ -3,10 +3,17 @@
    Header, sidebar index, on-this-page TOC, search dialog, pagination.
    ========================================================================== */
 
-/* ---------- Header ---------- */
-.header {
+/* ---------- Header ----------
+   Starlight renders <header class="header"><div class="header">…</div></header>
+   — BOTH elements carry `.header`. A bare `.header` rule therefore paints
+   its border twice (outer + inner), which read as a doubled underline.
+   Scope to the outer <header> only and neutralise the inner wrapper. */
+header.header {
   border-bottom: var(--wd-rule);
   background: var(--sl-color-bg-nav);
+}
+header.header > .header {
+  border-bottom: 0;
 }
 .site-title {
   font-family: var(--wd-font-display);
@@ -73,10 +80,37 @@
   color: var(--sl-color-white);
 }
 
-/* Nested lists: hairline guide instead of default indent bar */
+/* Nested lists.
+   Starlight draws one guide rail per nesting level (`border-inline-start` on
+   every `ul ul li`). In a 3-4 level tree that is 3-4 parallel vertical lines
+   a few pixels apart, which reads as "duplicated" lines. This theme
+   previously ALSO added a border on the `ul` itself, doubling them again.
+
+   Now: no rail on the `ul`, and only ONE rail in the whole nested column —
+   the one belonging to the innermost list that holds links (`ul` whose
+   children are plain <li><a> rows). Outer levels are separated by indent
+   alone. */
 .sidebar-content ul ul {
-  border-inline-start: var(--wd-rule);
-  margin-inline-start: 0.6rem;
+  border: 0;
+  margin-inline-start: 0;
+}
+.sidebar-content ul ul li {
+  --sl-sidebar-item-padding-inline: 0.4rem;
+  border-inline-start: 0;
+  margin-inline-start: 0.4rem;
+  padding-inline-start: 0;
+}
+/* The one rail: on link rows that sit directly inside a nested list. */
+.sidebar-content ul ul > li:has(> a) {
+  border-inline-start: 1px solid var(--wd-hairline);
+  padding-inline-start: 0.4rem;
+  margin-inline-start: 0.4rem;
+}
+/* The current page already carries its own 2px brass accent on the <a>
+   (see `a[aria-current='page']` below). Let that be the only mark on the
+   active row instead of drawing the rail right beside it. */
+.sidebar-content ul ul > li:has(> a[aria-current='page']) {
+  border-inline-start-color: transparent;
 }
 
 /* ---------- On-this-page (right TOC) ---------- */
@@ -182,4 +216,46 @@ footer .meta {
   font-family: var(--wd-font-mono);
   font-size: 0.72rem;
   letter-spacing: 0.03em;
+}
+
+/* ---------- Sidebar: sub-group labels + long symbol names ----------
+   Nested group labels (Functions, Enumerations, module names) were styled as
+   the same tiny uppercase mono as the top-level headings, and Starlight's
+   `overflow-wrap: anywhere` then broke them mid-word ("Enumera-tions") once
+   deep nesting had eaten the width. Sub-groups get a calmer label, and
+   symbol names only wrap at a real boundary. */
+.sidebar-content details details > summary .large {
+  font-family: var(--wd-font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--wd-paper-dim);
+}
+.sidebar-content details details > summary:hover .large {
+  color: var(--sl-color-white);
+}
+/* Long PascalCase symbol names ("ApplyAreaImpulseAndDamage") have no spaces,
+   so the browser can only wrap them by splitting a word — Starlight's
+   `overflow-wrap: anywhere` does exactly that ("...Damag / e"). Guide titles
+   ("Player / Vehicle / Game Mode Interfaces") contain spaces and should keep
+   wrapping normally. So: wrap only at real break opportunities (spaces),
+   and let a single unbreakable identifier clip with an ellipsis instead. */
+.sidebar-content li {
+  overflow-wrap: normal;
+}
+.sidebar-content li > a > span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Count badges on sub-groups: quiet, not a loud pill */
+.sidebar-content details details .sl-badge {
+  font-size: 0.6rem;
+  padding: 0 0.4em;
+  background: transparent;
+  border-color: var(--wd-hairline-strong);
+  color: var(--wd-muted);
 }

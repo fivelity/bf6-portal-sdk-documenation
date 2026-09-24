@@ -19,7 +19,6 @@ const ICON_BY_LABEL: Record<string, string> = {
   'Getting Started': 'rocket',
   'bf6-portal-mod-types': 'seti:typescript',
   'bf6-portal-utils': 'setting',
-  'API Reference': 'open-book',
 };
 ---
 
@@ -51,7 +50,7 @@ const ICON_BY_LABEL: Record<string, string> = {
 
     // Only the immediate children of the top-level <ul class="top-level">
     // are group/link roots we want to decorate — nested sub-items are left
-    // untouched so the icon set stays limited to the four top-level groups.
+    // untouched so the icon set stays limited to the three top-level groups.
     const topLevelLists = document.querySelectorAll<HTMLUListElement>('ul.top-level');
     for (const list of topLevelLists) {
       for (const li of Array.from(list.children)) {

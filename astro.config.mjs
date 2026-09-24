@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { buildReferenceSidebar } from './scripts/reference-sidebar.mjs';
 
 // Update `site` and `base` to match your GitHub Pages URL before deploying.
 // For a project page at https://<user>.github.io/<repo>/ set base to '/<repo>'.
@@ -8,6 +9,16 @@ import starlight from '@astrojs/starlight';
 const SITE_URL = 'https://fivelity.github.io';
 const BASE_PATH = '/bf6-portal-sdk-documenation';
 const REPO_URL = 'https://github.com/fivelity/bf6-portal-sdk-documenation';
+
+/**
+ * The generated API reference for one package, as a single collapsed
+ * "API Reference" subgroup. index 0 = mod-types, 1 = utils.
+ */
+const referenceGroups = buildReferenceSidebar();
+const apiGroup = (i) => {
+  const g = referenceGroups[i];
+  return { label: 'API Reference', collapsed: true, items: g.items };
+};
 
 export default defineConfig({
   site: SITE_URL,
@@ -52,6 +63,10 @@ export default defineConfig({
         },
       },
 
+      // One dropdown per package. Each holds that package's guides AND its
+      // generated API reference, so the tree never splits a package across
+      // two places. `buildReferenceSidebar()` flattens TypeDoc's wrapper
+      // directories (see scripts/reference-sidebar.mjs).
       sidebar: [
         {
           label: 'Getting Started',
@@ -68,6 +83,7 @@ export default defineConfig({
             { label: 'Overview & Schemas', slug: 'mod-types/overview' },
             { label: 'Event Handlers & Enums', slug: 'mod-types/events-and-enums' },
             { label: 'Player / Vehicle / Game Mode Interfaces', slug: 'mod-types/interfaces' },
+            apiGroup(0),
           ],
         },
         {
@@ -83,25 +99,7 @@ export default defineConfig({
             { label: 'Module Usage Examples', slug: 'utils/module-examples' },
             { label: 'State & Rule Patterns', slug: 'utils/state-and-rules' },
             { label: 'Other Modules', slug: 'utils/other-modules' },
-          ],
-        },
-        {
-          label: 'API Reference',
-          items: [
-            {
-              label: 'mod-types',
-              badge: { text: '431 fn · 83 enum', variant: 'note' },
-              items: [
-                { autogenerate: { directory: 'reference/mod-types', collapsed: true } },
-              ],
-            },
-            {
-              label: 'utils',
-              badge: { text: '21 modules', variant: 'note' },
-              items: [
-                { autogenerate: { directory: 'reference/utils', collapsed: true } },
-              ],
-            },
+            apiGroup(1),
           ],
         },
       ],
