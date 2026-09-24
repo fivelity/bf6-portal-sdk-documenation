@@ -42,8 +42,8 @@ Visit `http://localhost:4321`.
 
 ## Project structure
 
-```
-├── .github/workflows/deploy-docs.yml   # CI: docs:api → typecheck → build → deploy to Pages
+```code
+├── .github/workflows/deploy-docs.yml    # CI: docs:api → typecheck → build → deploy to Pages
 ├── astro.config.mjs                     # Starlight config, curated sidebar, site/base URL
 ├── curated/                             # Hand-written landing pages (source of truth)
 │   └── mod-types/                       #   mirrors the generated reference/ tree path-for-path
