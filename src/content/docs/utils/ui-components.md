@@ -23,7 +23,7 @@ time, so button clicks dispatch automatically. This means **you must use
 Twelve component classes live under `bf6-portal-utils/ui/components/*`:
 
 | Component | Import path |
-|---|---|
+| --- | --- |
 | `UIContainer` | `bf6-portal-utils/ui/components/container` |
 | `UIButton` | `bf6-portal-utils/ui/components/button` |
 | `UIContainerButton` | `bf6-portal-utils/ui/components/container-button` |

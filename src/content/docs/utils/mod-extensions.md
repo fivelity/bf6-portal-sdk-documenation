@@ -27,7 +27,7 @@ Events.OnPlayerDied.subscribe((victim, killer, deathType) => {
 ```
 
 | Function | Signature |
-|---|---|
+| --- | --- |
 | `isDamageType` | `(eventDamageType: mod.DamageType, playerDamageType: mod.PlayerDamageTypes) => boolean` |
 | `isDeathType` | `(eventDeathType: mod.DeathType, playerDeathType: mod.PlayerDeathTypes) => boolean` |
 | `isGadget` | `(weaponUnlock: mod.WeaponUnlock, gadget: mod.Gadgets) => boolean` |

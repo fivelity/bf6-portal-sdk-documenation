@@ -34,7 +34,7 @@ The module is self-contained — it doesn't depend on any other
 ## Conversion
 
 | Function | Signature |
-|---|---|
+| --- | --- |
 | `toVector` | `(vector: Vector3) => mod.Vector` — via `mod.CreateVector` |
 | `toVector3` | `(vector: mod.Vector) => Vector3` — via the three `*ComponentOf` reads |
 
@@ -44,7 +44,7 @@ All arithmetic functions take `Vector3` arguments, return a **new**
 `Vector3`, and never mutate their inputs:
 
 | Function | Signature |
-|---|---|
+| --- | --- |
 | `add` | `(a: Vector3, b: Vector3) => Vector3` |
 | `subtract` | `(a: Vector3, b: Vector3) => Vector3` |
 | `multiply` | `(vector: Vector3, scalar: number) => Vector3` |
@@ -55,7 +55,7 @@ All arithmetic functions take `Vector3` arguments, return a **new**
 ## Utilities
 
 | Function | Signature |
-|---|---|
+| --- | --- |
 | `truncate` | `(vector: Vector3, decimalPlaces?: number) => Vector3` — default 2 places |
 | `rotateAroundAxis` | `(vector: Vector3, axis: Vector3, angleRad: number) => Vector3` — Rodrigues' rotation formula |
 | `degreesToRadians` | `(degrees: number) => number` |
@@ -69,7 +69,7 @@ All arithmetic functions take `Vector3` arguments, return a **new**
 ## Constants
 
 | Constant | Value |
-|---|---|
+| --- | --- |
 | `ZERO_VECTOR3` | `{ x: 0, y: 0, z: 0 }` |
 | `ONE_VECTOR3` | `{ x: 1, y: 1, z: 1 }` |
 | `ZERO_VECTOR` | `mod.CreateVector(0, 0, 0)` — for APIs that require a `mod.Vector` |

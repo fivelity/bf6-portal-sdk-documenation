@@ -31,7 +31,7 @@ it, since every module's public API is expressed in terms of `mod.*` types.
 ## The 21 modules
 
 | Module | Import path | What it does |
-|---|---|---|
+| --- | --- | --- |
 | **Events** | `bf6-portal-utils/events` | Owns every raw Portal event handler once and lets any number of subscribers listen — see [Events](/utils/events/) |
 | **Vectors** | `bf6-portal-utils/vectors` | Transparent `{x, y, z}` vector math on top of the opaque `mod.Vector` type — see [Vector Math](/utils/vector-math/) |
 | **Timers** | `bf6-portal-utils/timers` | `setTimeout`/`setInterval`-style scheduling, since QuickJS has none natively — see [Timers & Clocks](/utils/timers-and-clocks/) |
