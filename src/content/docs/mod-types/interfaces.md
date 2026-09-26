@@ -74,15 +74,18 @@ page for the full API.
 
 ## `mod.Object`
 
-`mod.Object` is a **union** of the opaque scene-entity types — capture
-points, area triggers, spawners, world icons, players, vehicles, and so on
-(see its declaration in the
+`mod.Object` is a **union** of every opaque scene-entity type the SDK
+declares — `CapturePoint`, `AreaTrigger`, `Spawner`, `WorldIcon`, `Player`,
+`Vehicle`, and the rest (see its declaration in the
 [Type Aliases reference](/reference/mod-types/bf6-portal-mod-types/namespaces/mod/type-aliases/)).
-Functions that accept "any placed thing" — `mod.GetObjId` and
-`mod.GetObjectPosition` among them — take a `mod.Object`.
+It exists so functions that accept "any placed thing" — `mod.GetObjId` and
+`mod.GetObjectPosition` among them — can declare one parameter type instead
+of one overload per entity kind.
 
-`mod.GetObjId(object)` returns the **numeric** ObjId. That integer must
-match something actually placed in the level's scene data; the type system
+`mod.GetObjId(object: mod.Object): number` takes one of these opaque
+references and returns its **numeric** ObjId — it does not convert an
+already-numeric ID into an object. That returned integer must match
+something actually placed in the level's scene data; the type system
 cannot validate that a given literal is valid for a specific map, so a
 stale or typo'd ObjId fails at runtime, not at compile time. Centralize
 ObjIds in one config module rather than inlining numeric literals

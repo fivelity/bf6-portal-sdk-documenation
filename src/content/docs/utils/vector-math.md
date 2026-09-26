@@ -6,7 +6,7 @@ description: Vectors.Vector3 — a transparent {x, y, z} vector type that conver
 `mod.Vector` is opaque — you can only build one with `mod.CreateVector` and
 read it back with `mod.XComponentOf` / `mod.YComponentOf` / `mod.ZComponentOf`.
 Writing vector math directly against that functional API gets clunky fast.
-The [`Vectors` module](https://www.npmjs.com/package/bf6-portal-utils)
+The [`Vectors` module](/reference/utils/vectors/)
 (`bf6-portal-utils/vectors`) defines a transparent `Vector3` type — a plain
 `{ x, y, z }` object you can read and write directly — plus conversion
 helpers for the boundary where you actually call a `mod.*` function.

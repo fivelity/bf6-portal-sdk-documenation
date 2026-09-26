@@ -10,9 +10,10 @@
  * This script runs as the last step of `pnpm build`, after `astro build`,
  * and prefixes every root-relative `href`/`src` attribute in the HTML
  * files under `dist/` with the site base. The base is read from
- * astro.config.mjs (the single source of truth), so changing
- * `BASE_PATH` there is all that is ever needed — content keeps using
- * plain root-relative links.
+ * astro.config.mjs's `BASE_PATH` constant (the single source of truth) by
+ * parsing the file's source text rather than importing it — see
+ * `siteBase()` below for why — so changing `BASE_PATH` there is all that
+ * is ever needed; content keeps using plain root-relative links.
  *
  * Skips protocol-relative (`//…`), already-prefixed, and external
  * (`https:`, `mailto:`, `data:`) values; idempotent, so re-running over a
@@ -26,9 +27,26 @@ const DIST = 'dist';
 /** A root-relative href/src attribute (single or double quoted). */
 const ATTR_RE = /(\s(?:href|src)=)(["'])(\/(?![/])[^"']*)\2/g;
 
+/**
+ * Reads `BASE_PATH` out of astro.config.mjs's source text rather than
+ * dynamically importing the module. Importing would also execute every
+ * plugin the config wires up (e.g. `starlight-llms-txt`, whose package
+ * ships a `.ts` entry point) — fine under Astro's own Vite-powered loader,
+ * but Node's native ESM loader refuses to strip types for anything under
+ * node_modules, so a plain `import()` from a standalone script fails with
+ * ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING. astro.config.mjs documents
+ * `BASE_PATH` as its single source of truth for the site base, so this
+ * regex read honors that contract without re-running the whole config.
+ */
 async function siteBase() {
-  const config = (await import('../astro.config.mjs')).default;
-  const base = typeof config.base === 'string' ? config.base : '';
+  const configSource = await readFile('astro.config.mjs', 'utf8');
+  const match = configSource.match(/const\s+BASE_PATH\s*=\s*(['"])([^'"]*)\1/);
+  if (!match) {
+    throw new Error(
+      '[docs:base] Could not find `const BASE_PATH = \'...\'` in astro.config.mjs — update the regex if that line changed shape.',
+    );
+  }
+  const base = match[2];
   return base === '/' ? '' : base.replace(/\/$/, '');
 }
 

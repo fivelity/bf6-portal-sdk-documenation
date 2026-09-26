@@ -1,6 +1,6 @@
 ---
 title: Module Usage Examples
-description: Compiling TypeScript examples for Sounds, Raycast, PortalGadget, PerformanceStats, MapDetector, MultiClickDetector, ScavengerDrop, Benchmarker, and Logging.
+description: Compiling TypeScript examples for every bf6-portal-utils module without its own guide — Sounds, Raycast, PortalGadget, PerformanceStats, MapDetector, MultiClickDetector, ScavengerDrop, PlayerUndeployFixer, FFADropIns, FFASpawnPoints, Benchmarker, Logging, and CallbackHandler.
 ---
 
 Every snippet below uses only signatures present in
@@ -124,6 +124,65 @@ undeploy after dying.
 
 ```ts
 import 'bf6-portal-utils/player-undeploy-fixer';
+```
+
+## FFADropIns
+
+Short-circuits the normal deploy flow for free-for-all modes: call
+`initialize()` once in `OnGameModeStarted`, instantiate a `Soldier` for
+each player in `OnPlayerJoinGame`, and call `startDelayForPrompt()` again
+whenever they need to respawn.
+
+```ts
+import { Events } from 'bf6-portal-utils/events';
+import { FFADropIns } from 'bf6-portal-utils/ffa-drop-ins';
+
+Events.OnGameModeStarted.subscribe(() => {
+  FFADropIns.initialize(
+    {
+      spawnRectangles: [{ minX: -100, minZ: -100, maxX: 100, maxZ: 100 }],
+      y: 50,
+    },
+    { dropInPoints: 8, initialPromptDelay: 3 },
+  );
+  FFADropIns.enableSpawnQueueProcessing();
+});
+
+const soldiers = new Map<number, FFADropIns.Soldier>();
+
+Events.OnPlayerJoinGame.subscribe((player) => {
+  const soldier = new FFADropIns.Soldier(player);
+  soldiers.set(mod.GetObjId(player), soldier);
+  soldier.startDelayForPrompt();
+});
+
+Events.OnPlayerUndeploy.subscribe((player) => {
+  soldiers.get(mod.GetObjId(player))?.startDelayForPrompt();
+});
+```
+
+## FFASpawnPoints
+
+Same drop-in flow as `FFADropIns`, but seeded from a fixed list of
+`[x, y, z, orientation]` spawn points instead of a rectangle region —
+useful when a map already has curated FFA spawns.
+
+```ts
+import { Events } from 'bf6-portal-utils/events';
+import { FFASpawnPoints } from 'bf6-portal-utils/ffa-spawn-points';
+
+Events.OnGameModeStarted.subscribe(() => {
+  const spawns: FFASpawnPoints.SpawnData[] = [
+    [120, 12, -40, 90],
+    [-120, 12, 40, 270],
+  ];
+  FFASpawnPoints.initialize(spawns, { minimumSafeDistance: 25 });
+  FFASpawnPoints.enableSpawnQueueProcessing();
+});
+
+Events.OnPlayerJoinGame.subscribe((player) => {
+  new FFASpawnPoints.Soldier(player).startDelayForPrompt();
+});
 ```
 
 ## Benchmarker

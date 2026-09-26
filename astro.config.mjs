@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightLlmsTxt from 'starlight-llms-txt';
 import { buildReferenceSidebar } from './scripts/reference-sidebar.mjs';
 
 // Update `site` and `base` to match your GitHub Pages URL before deploying.
@@ -15,8 +16,10 @@ const REPO_URL = 'https://github.com/fivelity/bf6-portal-sdk-documenation';
  * "API Reference" subgroup. index 0 = mod-types, 1 = utils.
  */
 const referenceGroups = buildReferenceSidebar();
+/** @param {number} i */
 const apiGroup = (i) => {
   const g = referenceGroups[i];
+  if (!g) throw new Error(`[astro.config] No reference sidebar group at index ${i}`);
   return { label: 'API Reference', collapsed: true, items: g.items };
 };
 
@@ -34,6 +37,25 @@ export default defineConfig({
       pagination: true,
       social: [{ icon: 'github', label: 'GitHub', href: REPO_URL }],
       editLink: { baseUrl: `${REPO_URL}/edit/main/` },
+
+      // Publishes /llms.txt, /llms-full.txt, and /llms-small.txt so LLM
+      // tooling and agents can consume this site directly instead of
+      // scraping rendered HTML. Every page is generated from the real
+      // .d.ts files (see README "Notes on accuracy"), so the full-text
+      // dump is safe to hand to a model as ground truth.
+      plugins: [
+        starlightLlmsTxt({
+          projectName: 'BF6 Portal SDK',
+          description:
+            'TypeScript documentation for bf6-portal-mod-types and bf6-portal-utils, generated directly from the installed packages\u2019 .d.ts files.',
+          // Reference symbol pages dominate the tree (~950 pages) and are
+          // low-value as full-text context compared to the conceptual
+          // guides; llms.txt still links every reference index so an
+          // agent can fetch a specific symbol page on demand.
+          demote: ['reference/**'],
+          promote: ['index', 'guides/**', 'mod-types/**', 'utils/**'],
+        }),
+      ],
 
       // Order matters: fonts first, then the theme entry.
       // Fontsource variable fonts are self-hosted → no third-party request.
@@ -98,7 +120,6 @@ export default defineConfig({
             { label: 'Mod Extensions', slug: 'utils/mod-extensions' },
             { label: 'Module Usage Examples', slug: 'utils/module-examples' },
             { label: 'State & Rule Patterns', slug: 'utils/state-and-rules' },
-            { label: 'Other Modules', slug: 'utils/other-modules' },
             apiGroup(1),
           ],
         },

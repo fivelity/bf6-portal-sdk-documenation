@@ -9,7 +9,8 @@
     "build": "pnpm run docs:api && astro build && node scripts/prefix-dist-base-links.mjs",
     "preview": "astro preview",
     "astro": "astro",
-    "docs:api": "pnpm run docs:api:mod-types && pnpm run docs:api:utils",
+    "docs:api": "pnpm run docs:stats && pnpm run docs:api:mod-types && pnpm run docs:api:utils",
+    "docs:stats": "node scripts/generate-stats.mjs",
     "docs:api:mod-types": "typedoc --options typedoc/mod-types.json && node scripts/add-reference-frontmatter.mjs mod-types && node scripts/rewrite-reference-links.mjs mod-types && node scripts/copy-curated-pages.mjs mod-types",
     "docs:api:utils": "typedoc --options typedoc/utils.json && node scripts/add-reference-frontmatter.mjs utils && node scripts/rewrite-reference-links.mjs utils && node scripts/copy-curated-pages.mjs utils",
     "typecheck": "astro check && tsc --noEmit"
@@ -27,6 +28,7 @@
     "@astrojs/check": "^0.9.10",
     "bf6-portal-mod-types": "^4.3.0",
     "bf6-portal-utils": "^9.4.0",
+    "starlight-llms-txt": "^0.12.0",
     "typedoc": "^0.28.20",
     "typedoc-plugin-markdown": "^4.13.1",
     "typescript": "^5.9.3"
