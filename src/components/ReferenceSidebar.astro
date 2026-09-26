@@ -1,0 +1,81 @@
+---
+// Wraps Starlight's default Sidebar to add an icon next to each top-level
+// sidebar item (group or link), keyed by that item's own label text.
+//
+// Why not the sidebar config directly: Starlight's sidebar schema has no
+// `icon` field on groups or links (only `label`, `badge`, `collapsed`,
+// `translations`, `attrs`) — see node_modules/@astrojs/starlight/dist/schemas/sidebar.js.
+// This wrapper renders the real <Sidebar /> unmodified, then a tiny inline
+// script tags each *top-level* entry with a matching icon after hydration.
+// It's keyed by label text rather than DOM position, so reordering items
+// in astro.config.mjs's sidebar array doesn't break anything — only
+// renaming a top-level label requires updating ICON_BY_LABEL below.
+import Sidebar from '@astrojs/starlight/components/Sidebar.astro';
+import { Icon } from '@astrojs/starlight/components';
+
+// Label text (exact match, case-sensitive) -> Starlight icon name.
+// Keep in sync with the top-level `label`s in astro.config.mjs's sidebar.
+const ICON_BY_LABEL: Record<string, string> = {
+  'Getting Started': 'rocket',
+  'bf6-portal-mod-types': 'seti:typescript',
+  'bf6-portal-utils': 'setting',
+};
+---
+
+<Sidebar />
+
+{
+  Object.entries(ICON_BY_LABEL).map(([label, icon]) => (
+    <template data-sidebar-icon-label={label} data-sidebar-icon-name={icon}>
+      <Icon name={icon as never} />
+    </template>
+  ))
+}
+
+<script>
+  // Runs once per page load (sidebar is server-rendered per navigation in
+  // Starlight's MPA-style routing, so no need for an Astro island / client
+  // directive — a plain inline script re-runs on every page).
+  function decorateTopLevelSidebarLabels(): void {
+    const templates = document.querySelectorAll<HTMLTemplateElement>(
+      'template[data-sidebar-icon-label]',
+    );
+    if (templates.length === 0) return;
+
+    const iconByLabel = new Map<string, string>();
+    for (const tpl of templates) {
+      const label = tpl.dataset.sidebarIconLabel;
+      if (label) iconByLabel.set(label, tpl.innerHTML);
+    }
+
+    // Only the immediate children of the top-level <ul class="top-level">
+    // are group/link roots we want to decorate — nested sub-items are left
+    // untouched so the icon set stays limited to the three top-level groups.
+    const topLevelLists = document.querySelectorAll<HTMLUListElement>('ul.top-level');
+    for (const list of topLevelLists) {
+      for (const li of Array.from(list.children)) {
+        const labelHost = li.querySelector<HTMLElement>(
+          ':scope > a > span, :scope > details > summary .large',
+        );
+        if (!labelHost) continue;
+        const text = labelHost.textContent?.trim();
+        if (!text) continue;
+
+        const iconHtml = iconByLabel.get(text);
+        if (!iconHtml) continue;
+        if (labelHost.querySelector('[data-injected-sidebar-icon]')) continue; // already done
+
+        const wrapper = document.createElement('span');
+        wrapper.setAttribute('data-injected-sidebar-icon', '');
+        wrapper.style.display = 'inline-flex';
+        wrapper.style.marginInlineEnd = '0.4em';
+        wrapper.style.verticalAlign = 'text-bottom';
+        wrapper.innerHTML = iconHtml;
+        labelHost.prepend(wrapper);
+      }
+    }
+  }
+
+  decorateTopLevelSidebarLabels();
+  document.addEventListener('astro:page-load', decorateTopLevelSidebarLabels);
+</script>

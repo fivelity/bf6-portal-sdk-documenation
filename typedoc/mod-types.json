@@ -1,9 +1,11 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["node_modules/bf6-portal-mod-types/index.d.ts"],
-  "out": "src/content/docs/reference/mod-types",
+  "tsconfig": "./tsconfig.mod-types.json",
+  "entryPoints": ["../node_modules/bf6-portal-mod-types/index.d.ts"],
+  "out": "../src/content/docs/reference/mod-types",
   "plugin": ["typedoc-plugin-markdown"],
   "readme": "none",
+  "entryFileName": "index",
   "hidePageHeader": false,
   "hideBreadcrumbs": true,
   "useCodeBlocks": true,
@@ -16,11 +18,10 @@
   "interfacePropertiesFormat": "table",
   "outputFileStrategy": "members",
   "flattenOutputFiles": false,
-  "excludeExternals": true,
+  "excludeExternals": false,
   "excludePrivate": true,
   "excludeInternal": true,
   "excludeNotDocumented": false,
   "sort": ["kind", "alphabetical"],
-  "gitRevision": "main",
-  "disableSources": false,
+  "gitRevision": "main"
 }

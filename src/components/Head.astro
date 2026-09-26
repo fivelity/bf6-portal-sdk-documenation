@@ -1,0 +1,29 @@
+---
+/**
+ * Head override.
+ *
+ * Renders Starlight's normal <head> output, plus one inline <style> that
+ * sets `--wd-kicker`, the mono eyebrow above each page title (the manifest's
+ * `.doc-number` label). Build-time only — no client JS.
+ */
+const { head, entry } = Astro.locals.starlightRoute;
+const id: string = entry.id;
+
+const KICKERS: ReadonlyArray<readonly [prefix: string, label: string]> = [
+  ['reference/mod-types', 'API Reference · mod-types'],
+  ['reference/utils', 'API Reference · utils'],
+  ['reference', 'API Reference'],
+  ['mod-types', 'bf6-portal-mod-types'],
+  ['utils', 'bf6-portal-utils'],
+  ['guides', 'Getting Started'],
+];
+
+const match = KICKERS.find(([prefix]) => id === prefix || id.startsWith(`${prefix}/`));
+const kicker: string = match ? match[1] : 'BF6 Portal SDK';
+
+// Escape for a CSS string literal.
+const css = `:root{--wd-kicker:'${kicker.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'}`;
+---
+
+{head.map(({ tag: Tag, attrs, content }) => <Tag {...attrs} set:html={content} />)}
+<style is:inline set:html={css}></style>

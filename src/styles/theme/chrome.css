@@ -1,0 +1,261 @@
+/* ==========================================================================
+   WARDOGS THEME — 03 · CHROME
+   Header, sidebar index, on-this-page TOC, search dialog, pagination.
+   ========================================================================== */
+
+/* ---------- Header ----------
+   Starlight renders <header class="header"><div class="header">…</div></header>
+   — BOTH elements carry `.header`. A bare `.header` rule therefore paints
+   its border twice (outer + inner), which read as a doubled underline.
+   Scope to the outer <header> only and neutralise the inner wrapper. */
+header.header {
+  border-bottom: var(--wd-rule);
+  background: var(--sl-color-bg-nav);
+}
+header.header > .header {
+  border-bottom: 0;
+}
+.site-title {
+  font-family: var(--wd-font-display);
+  font-weight: 800;
+  font-size: 1.45rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--sl-color-white);
+}
+.site-title:hover {
+  color: var(--wd-brass-bright);
+}
+
+/* ---------- Sidebar: manifest "index" ---------- */
+#starlight__sidebar,
+.sidebar-pane {
+  background: var(--sl-color-bg-sidebar);
+  border-inline-end: var(--wd-rule);
+}
+
+/* Top-level group labels → mono, uppercase, muted (manifest .index-group-label) */
+.sidebar-content .large {
+  font-family: var(--wd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--wd-muted);
+}
+.sidebar-content details > summary {
+  padding-block: 0.5rem;
+}
+.sidebar-content details > summary:hover .large {
+  color: var(--wd-paper-dim);
+}
+
+/* Links: square, 2px left rail that turns brass when current */
+.sidebar-content a {
+  font-size: 0.86rem;
+  border-radius: var(--wd-radius);
+  border-inline-start: 2px solid transparent;
+  color: var(--wd-paper-dim);
+  transition:
+    color var(--wd-fast) var(--wd-ease),
+    background var(--wd-fast) var(--wd-ease),
+    border-color var(--wd-fast) var(--wd-ease);
+}
+.sidebar-content a:hover {
+  color: var(--sl-color-white);
+  background: rgba(255, 255, 255, 0.03);
+}
+:root[data-theme='light'] .sidebar-content a:hover {
+  background: rgba(16, 15, 12, 0.04);
+}
+.sidebar-content a[aria-current='page'] {
+  color: var(--sl-color-white);
+  background: color-mix(in srgb, var(--wd-brass) 9%, transparent);
+  border-inline-start-color: var(--wd-brass);
+  font-weight: 500;
+}
+/* Starlight paints current links with accent-bg + inverted text by default;
+   restore legible text on our tinted plate. */
+.sidebar-content a[aria-current='page']:not(.not-content) {
+  color: var(--sl-color-white);
+}
+
+/* Nested lists.
+   Starlight draws one guide rail per nesting level (`border-inline-start` on
+   every `ul ul li`). In a 3-4 level tree that is 3-4 parallel vertical lines
+   a few pixels apart, which reads as "duplicated" lines. This theme
+   previously ALSO added a border on the `ul` itself, doubling them again.
+
+   Now: no rail on the `ul`, and only ONE rail in the whole nested column —
+   the one belonging to the innermost list that holds links (`ul` whose
+   children are plain <li><a> rows). Outer levels are separated by indent
+   alone. */
+.sidebar-content ul ul {
+  border: 0;
+  margin-inline-start: 0;
+}
+.sidebar-content ul ul li {
+  --sl-sidebar-item-padding-inline: 0.4rem;
+  border-inline-start: 0;
+  margin-inline-start: 0.4rem;
+  padding-inline-start: 0;
+}
+/* The one rail: on link rows that sit directly inside a nested list. */
+.sidebar-content ul ul > li:has(> a) {
+  border-inline-start: 1px solid var(--wd-hairline);
+  padding-inline-start: 0.4rem;
+  margin-inline-start: 0.4rem;
+}
+/* The current page already carries its own 2px brass accent on the <a>
+   (see `a[aria-current='page']` below). Let that be the only mark on the
+   active row instead of drawing the rail right beside it. */
+.sidebar-content ul ul > li:has(> a[aria-current='page']) {
+  border-inline-start-color: transparent;
+}
+
+/* ---------- On-this-page (right TOC) ---------- */
+starlight-toc a,
+mobile-starlight-toc a {
+  font-size: 0.8rem;
+  border-radius: var(--wd-radius);
+  color: var(--wd-muted);
+  transition: color var(--wd-fast) var(--wd-ease);
+}
+starlight-toc a:hover,
+mobile-starlight-toc a:hover {
+  color: var(--sl-color-white);
+}
+starlight-toc a[aria-current='true'],
+mobile-starlight-toc a[aria-current='true'] {
+  color: var(--wd-brass-bright);
+}
+.right-sidebar-panel h2 {
+  font-family: var(--wd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--wd-muted);
+}
+.right-sidebar {
+  border-inline-start: var(--wd-rule);
+}
+
+/* ---------- Search button + Pagefind dialog ---------- */
+site-search button[data-open-modal] {
+  border-radius: var(--wd-radius);
+  border: var(--wd-rule-strong);
+  background: var(--wd-plate);
+  font-family: var(--wd-font-mono);
+  font-size: 0.78rem;
+}
+site-search button[data-open-modal]:hover {
+  border-color: var(--wd-brass);
+}
+site-search kbd {
+  font-size: 0.66rem;
+}
+
+dialog[aria-label] {
+  border-radius: var(--wd-radius);
+  background: var(--sl-color-bg);
+  box-shadow: var(--sl-shadow-lg);
+}
+#starlight__search {
+  --pagefind-ui-primary: var(--wd-brass);
+  --pagefind-ui-text: var(--wd-paper-dim);
+  --pagefind-ui-background: var(--wd-plate);
+  --pagefind-ui-border: var(--wd-hairline-strong);
+  --pagefind-ui-tag: var(--wd-hairline);
+  --pagefind-ui-border-radius: 2px;
+  --pagefind-ui-font: var(--wd-font-body);
+}
+#starlight__search .pagefind-ui__result-title a {
+  font-family: var(--wd-font-display);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+#starlight__search .pagefind-ui__result-excerpt mark {
+  background: color-mix(in srgb, var(--wd-brass) 28%, transparent);
+  color: var(--sl-color-white);
+  padding-inline: 2px;
+}
+
+/* ---------- Pagination: manifest plates ---------- */
+.pagination-links a {
+  border-radius: var(--wd-radius);
+  border: var(--wd-rule-strong);
+  background: var(--wd-plate);
+  box-shadow: none;
+  transition:
+    border-color var(--wd-fast) var(--wd-ease),
+    background var(--wd-fast) var(--wd-ease);
+}
+.pagination-links a:hover {
+  border-color: var(--wd-brass);
+  background: var(--wd-plate-hover);
+}
+.pagination-links .link-title {
+  font-family: var(--wd-font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--sl-color-white);
+}
+
+/* ---------- Theme / language selects ---------- */
+starlight-theme-select select,
+starlight-lang-select select {
+  border-radius: var(--wd-radius);
+  font-family: var(--wd-font-mono);
+  font-size: 0.78rem;
+}
+
+/* ---------- Footer meta ---------- */
+footer .meta a,
+footer .meta {
+  font-family: var(--wd-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+}
+
+/* ---------- Sidebar: sub-group labels + long symbol names ----------
+   Nested group labels (Functions, Enumerations, module names) were styled as
+   the same tiny uppercase mono as the top-level headings, and Starlight's
+   `overflow-wrap: anywhere` then broke them mid-word ("Enumera-tions") once
+   deep nesting had eaten the width. Sub-groups get a calmer label, and
+   symbol names only wrap at a real boundary. */
+.sidebar-content details details > summary .large {
+  font-family: var(--wd-font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--wd-paper-dim);
+}
+.sidebar-content details details > summary:hover .large {
+  color: var(--sl-color-white);
+}
+/* Long PascalCase symbol names ("ApplyAreaImpulseAndDamage") have no spaces,
+   so the browser can only wrap them by splitting a word — Starlight's
+   `overflow-wrap: anywhere` does exactly that ("...Damag / e"). Guide titles
+   ("Player / Vehicle / Game Mode Interfaces") contain spaces and should keep
+   wrapping normally. So: wrap only at real break opportunities (spaces),
+   and let a single unbreakable identifier clip with an ellipsis instead. */
+.sidebar-content li {
+  overflow-wrap: normal;
+}
+.sidebar-content li > a > span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Count badges on sub-groups: quiet, not a loud pill */
+.sidebar-content details details .sl-badge {
+  font-size: 0.6rem;
+  padding: 0 0.4em;
+  background: transparent;
+  border-color: var(--wd-hairline-strong);
+  color: var(--wd-muted);
+}

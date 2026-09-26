@@ -14,6 +14,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": [".astro/types.d.ts", "src/**/*", "typedoc/**/*.ts"],
+  "include": [".astro/types.d.ts", "src/**/*", "astro.config.mjs"],
   "exclude": ["dist", "node_modules"]
 }

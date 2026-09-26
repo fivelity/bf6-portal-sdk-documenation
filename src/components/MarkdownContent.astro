@@ -1,0 +1,20 @@
+---
+/**
+ * MarkdownContent override.
+ *
+ * Reproduces Starlight's default content container
+ * (`<div class="sl-markdown-content">`) and additionally tags API-reference
+ * pages with `data-section="reference"` on that same element.
+ * src/styles/theme/reference.css keys its compact, mono-headed rules for
+ * TypeDoc output on that attribute. Every other page renders identically to
+ * Starlight's default. Build-time only — no client JS.
+ */
+import '@astrojs/starlight/style/markdown.css';
+
+const id: string = Astro.locals.starlightRoute.entry.id;
+const isReference: boolean = id === 'reference' || id.startsWith('reference/');
+---
+
+<div class="sl-markdown-content" data-section={isReference ? 'reference' : undefined}>
+  <slot />
+</div>

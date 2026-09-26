@@ -9,68 +9,83 @@ compile error — it produces a mode that silently misbehaves at runtime.
 
 ## Single-owner event handlers
 
-Portal allows **exactly one** implementation per raw event. If two systems in
-your codebase both subscribe to the same underlying event independently, the
-second silently overrides the first — UI click handlers included.
+The Portal runtime scans your compiled mode for exported functions matching
+an event handler name (`OnPlayerDied`, `OngoingPlayer`,
+`OnCapturePointCaptured`, and 76 others under
+`mod.EventHandlerSignatures`) and calls them directly when that event
+fires. It allows **exactly one exported implementation of each handler name
+per compiled mode**. If two files in your codebase both export a function
+called `OnPlayerDied`, only one silently survives the build.
 
-The fix is to always subscribe through a namespaced event bus rather than a
-raw handler assignment, so every listener composes instead of overwriting:
+`bf6-portal-utils` solves this with its
+[`Events` module](/utils/events/), which owns every raw handler once and
+lets the rest of your codebase subscribe from as many places as needed:
 
 ```ts
-import { Events } from 'bf6-portal-mod-types';
+import { Events } from 'bf6-portal-utils/events';
 
-Events.OnPlayerDied.subscribe((player, killer) => {
-  // your logic
+Events.OnPlayerDied.subscribe((victim, killer, deathType, weapon) => {
+  // any number of subscribers can react to this
 });
 ```
 
-If two features need to react to the same event, they should both call
-`.subscribe(...)` on the same `Events.OnX` — never assign to a raw callback
-property directly.
+Once you adopt `Events`, **never export a raw event handler function
+yourself** — several other `bf6-portal-utils` modules (`UI`, `Raycast`,
+`Clocks`) rely on `Events` owning those hooks internally and will conflict
+with a hand-written handler of the same name.
+
+See [Event Handlers & Enums](/mod-types/events-and-enums/) for the full
+rule, and [bf6-portal-utils → Events](/utils/events/) for the subscription
+API.
 
 ## No fabricated symbols
 
-Because Portal's SDK has changed across versions and unofficial tutorials
-lag behind (or invent APIs outright), treat the installed `.d.ts` as the only
-source of truth. Common fabrications that show up in community write-ups but
-don't exist in the real SDK:
+Because unofficial tutorials and AI-generated snippets sometimes invent
+Portal APIs that don't exist, treat the installed `.d.ts` as the only
+source of truth — this site's [API Reference](/reference/mod-types/) is
+generated straight from it. A few real vs. commonly-assumed distinctions
+worth knowing up front:
 
-| Claimed symbol | Reality |
-|---|---|
-| `player.GetPosition()` | The player object is opaque with no methods — use `mod.GetSoldierState(player, SoldierStateVector.GetPosition)` |
-| `mod.RayCast(...)` returning a hit result | The real signature returns `void`; hits arrive via `OnRayCastHit` / `OnRayCastMissed` events |
-| `Network.OnReceiveFromClient` | No `Network` namespace exists |
-| `Input.OnActionPressed` | No `Input` namespace exists |
-| `new mod.Vector(x, y, z)` | Vectors are built with `mod.CreateVector(x, y, z)` only |
-| `mod.getTeamId` / `mod.getPlayerId` | Not present — use `mod.GetTeam(player)` |
+| Real API | Common mistake |
+| --- | --- |
+| `mod.GetObjId(player)` for a stable ID, `mod.Equals(a, b)` to compare | `player.id`, `player === otherPlayer` — `Player` is opaque, it has no properties to read directly |
+| `mod.CreateVector(x, y, z)` | `new mod.Vector(x, y, z)` — `Vector` is an opaque type, not a constructible class |
+| `mod.RayCast(...)` returns `void`; results arrive via `OnRayCastHit` / `OnRayCastMissed` | Assuming the call itself returns a hit result synchronously |
+| `console.log(...)` only | `console.error` / `console.warn` — the injected `console` global has a single `log` method |
+| `mod.Wait(seconds)` returns `Promise<void>` | A synchronous sleep — `Wait` must be `await`ed inside an `async` handler |
 
 When in doubt, check the [API Reference](/reference/mod-types/) — it's
-generated straight from the type package, so anything not listed there
-doesn't exist.
+generated from the type package, so anything not listed there doesn't exist.
 
 ## ObjIds are scene data, not constants you invent
 
-Every `CapturePoint`, `AreaTrigger`, `Spawner`, and `WorldIcon` your mode
-references is an integer ObjId that must match an object actually placed in
-the level's scene JSON. Centralize these in one config module and never
-inline a numeric ObjId literal elsewhere — a typo'd or stale ID fails at
-runtime, not at compile time, since the type system has no way to know which
-integers are valid for a given map.
+Every `CapturePoint`, `AreaTrigger`, `Spawner`, and other scene entity your
+mode references resolves to an integer ObjId via `mod.GetObjId`, and that
+integer must match an object actually placed in the level's scene data.
+Centralize these in one config module and never inline a numeric ObjId
+literal elsewhere — a typo'd or stale ID fails at runtime, not at compile
+time, since the type system has no way to know which integers are valid for
+a given map.
 
-## Signals over polling
+## QuickJS has no native timers
 
-`bf6-portal-utils` favors a reactive, signal-driven style for anything that
-drives UI or repeated state checks, rather than polling game state every
-tick. Prefer deriving UI state from a signal that updates on the relevant
-event, and throttle expensive recomputation rather than re-running it on
-every frame.
+Portal mode scripts run in a QuickJS runtime, which does **not** ship
+`setTimeout`/`setInterval`. The only native primitive for delayed or
+recurring execution is `mod.Wait(seconds)` (an awaitable delay inside an
+`async` handler). For cancellable timers, concurrent timers, or the
+familiar `setTimeout`/`setInterval` API shape, use the
+[`Timers` module](/utils/timers-and-clocks/) from `bf6-portal-utils`, which
+implements them on top of `mod.Wait` internally.
 
-## Separating persistent from wipeable state
+## UI ownership follows the same single-owner rule
 
-If your mode has any notion of risk (lost-on-death inventory, spent
-currency), keep that state distinct from anything meant to persist for the
-whole match (score, unlocked tiers). Conflating the two is a common source of
-bugs where a "permanent" unlock resets unexpectedly on respawn.
+The [`UI` module](/utils/ui-components/) subscribes to
+`OnPlayerUIButtonEvent` via `Events` at load time to dispatch button
+callbacks automatically. If you bring in `UI` (or `Raycast`, which
+similarly owns `OnRayCastHit`/`OnRayCastMissed`), you must route **all**
+your own event subscriptions through `Events` too — exporting a raw
+handler of your own for an event a `bf6-portal-utils` module already owns
+will conflict with it.
 
 ## Next: build something
 

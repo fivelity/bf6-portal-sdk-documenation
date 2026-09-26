@@ -5,7 +5,7 @@ description: Install bf6-portal-mod-types and bf6-portal-utils and configure a s
 
 ## Prerequisites
 
-- Node.js 18.17 or later
+- Node.js 24 or later (required by `bf6-portal-utils`)
 - A package manager — examples below use `pnpm`, but `npm`/`yarn` work the same
 
 ## Install the SDK packages
