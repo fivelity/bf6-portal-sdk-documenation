@@ -1,9 +1,9 @@
 ---
-title: BF6 Portal SDK
-description: TypeScript documentation for bf6-portal-mod-types and bf6-portal-utils.
+title: BF6 Portal SDK Docs
+description: Community-built, TypeDoc-generated reference for the Official Battlefield 6 Portal SDK — covering the mod namespace (bf6-portal-mod-types) and the bf6-portal-utils helper library, kept accurate for humans and AI coding agents alike.
 template: splash
 hero:
-  tagline: Typed, verified documentation for the Battlefield 6 Portal scripting SDK — covering bf6-portal-mod-types and bf6-portal-utils.
+  tagline: A community-built, TypeDoc-generated reference for the Official Battlefield 6 Portal SDK — for engineers, vibecoders, and everyone shipping mods with an LLM open in the next tab.
   actions:
     - text: Get Started
       link: /guides/introduction/
@@ -19,26 +19,40 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 ## Two packages, one SDK
 
+The **Official Battlefield 6 Portal SDK** — the `mod` namespace and its
+rule-block runtime — is EA/DICE's own product. This site documents it
+through two independent, community-published TypeScript packages built
+around that official SDK:
+
 <CardGrid>
 	<Card title="bf6-portal-mod-types" icon="seti:typescript">
-		Type declarations for the Portal runtime — `mod.*` namespace, event
-		handler signatures, enums, and the interfaces for players, vehicles, and
-		game mode objects.
+		Type declarations mirroring the official runtime. Every type here is
+		generated straight from the package's own `.d.ts` files — the
+		[`mod` namespace](/reference/mod-types/bf6-portal-mod-types/namespaces/mod/),
+		event handler signatures, enums, and interfaces for players, vehicles,
+		and game mode objects.
 	</Card>
 	<Card title="bf6-portal-utils" icon="setting">
-		Higher-level helpers built on top of the raw types — vector math, logic
-		helpers, rule block generators, and state management utilities for
-		writing game modes without repeating boilerplate.
+		The sister package that gets you moving faster: vector math, event
+		plumbing, UI components, and state patterns built on top of the raw
+		types. Authored by [deluca-mike](https://github.com/deluca-mike) and
+		built to work seamlessly with `mod-types`, so you spend less time on
+		boilerplate and more on your mode.
 	</Card>
 </CardGrid>
 
-## Ground truth, not tutorials
+## Built for how people actually mod now
 
-This site is generated directly from the installed `.d.ts` files with
-[TypeDoc](https://typedoc.org/), not hand-copied from community guides. If a
-symbol isn't in the reference, it isn't in the SDK — a distinction that matters,
-since fabricated APIs (imagined `Network` or `Input` namespaces, a `player.GetPosition()`
-that doesn't exist) circulate often enough in unofficial write-ups to trip up a build.
+Whether you're hand-writing every line or steering a local LLM through your
+first game mode, this site exists so what you generate actually compiles.
+Every symbol on this site — every function, enum member, and event
+signature — is extracted from the real, installed package, not recalled
+from a model's memory or copied out of a forum post. That matters more,
+not less, once AI tools enter the loop: an LLM asked to write Portal
+scripts will confidently invent APIs that don't exist unless it's grounded
+in something real. Point yours at this site's structured reference and
+[`llms.txt`](/llms.txt) output, and it has ground truth to work from
+instead of a guess.
 
 <CardGrid>
 	<Card title="Quickstart" icon="rocket">
@@ -46,8 +60,24 @@ that doesn't exist) circulate often enough in unofficial write-ups to trip up a 
 		[Read the guide →](/guides/quickstart/)
 	</Card>
 	<Card title="Architecture" icon="puzzle">
-		How mod-types and utils fit together, and the core Portal concepts
-		(events, signals, ObjIds) you need before writing rule logic.
+		The core Portal concepts — events, signals, ObjIds — you need before
+		writing rule logic, plus how mod-types and utils fit together.
 		[Read the guide →](/guides/architecture/)
 	</Card>
 </CardGrid>
+
+## Ground truth, not tutorials
+
+This site is generated directly from the installed `.d.ts` files with
+[TypeDoc](https://typedoc.org/), not hand-copied from community guides. If
+a symbol isn't in the reference, it isn't in the SDK — a distinction that
+matters, since fabricated APIs (imagined `Network` or `Input` namespaces, a
+`player.GetPosition()` that doesn't exist) circulate often enough in
+unofficial write-ups and AI output alike to trip up a build.
+
+That accuracy has one dependency worth naming plainly: this site tracks
+whatever version of `bf6-portal-mod-types` and `bf6-portal-utils` is
+currently installed (see the [About page](/about/) for details). If those
+packages lag behind a Portal update, so will this reference — always
+cross-check against the official DICE/EA documentation if something here
+doesn't match what you see at runtime.

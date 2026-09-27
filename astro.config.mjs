@@ -68,6 +68,8 @@ export default defineConfig({
 
       components: {
         Head: './src/components/Head.astro',
+        Header: './src/components/Header.astro',
+        Footer: './src/components/Footer.astro',
         Sidebar: './src/components/ReferenceSidebar.astro',
         MarkdownContent: './src/components/MarkdownContent.astro',
       },
@@ -97,6 +99,7 @@ export default defineConfig({
             { label: 'Installation & Setup', slug: 'guides/installation' },
             { label: 'Architecture & Core Concepts', slug: 'guides/architecture' },
             { label: 'Quickstart Guide', slug: 'guides/quickstart' },
+            { label: 'About', slug: 'about' },
           ],
         },
         {

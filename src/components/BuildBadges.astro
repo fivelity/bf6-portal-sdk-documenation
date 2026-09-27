@@ -1,0 +1,32 @@
+---
+/**
+ * BuildBadges.
+ *
+ * Small, rectangular, embossed-metal "ribbon" chips in the header — modeled
+ * on military service ribbons rather than pill-shaped SaaS badges, to match
+ * the Wardogs manifest aesthetic. Each ribbon has a mono/uppercase label row
+ * and a bold brass value row, with a hairline emboss border and a subtle
+ * diagonal sheen. Static, build-time only — no client JS.
+ *
+ * Content is data-driven from src/data/build-stats.ts so a new day/hour or
+ * model swap never touches markup.
+ */
+import { buildStats } from '../data/build-stats';
+---
+
+<div class="wd-build-badges" role="note" aria-label="Build provenance">
+  <span class="wd-ribbon" title={`Built with ${buildStats.tool}`}>
+    <span class="wd-ribbon__label">Built with</span>
+    <span class="wd-ribbon__value">{buildStats.tool}</span>
+  </span>
+  <span class="wd-ribbon" title={`Model: ${buildStats.model}`}>
+    <span class="wd-ribbon__label">Using</span>
+    <span class="wd-ribbon__value">{buildStats.model}</span>
+  </span>
+  <span class="wd-ribbon" title="Development time elapsed">
+    <span class="wd-ribbon__label">Elapsed</span>
+    <span class="wd-ribbon__value"
+      >DAY {String(buildStats.day).padStart(2, '0')} · HR {String(buildStats.hour).padStart(2, '0')}</span
+    >
+  </span>
+</div>

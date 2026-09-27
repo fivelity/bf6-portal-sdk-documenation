@@ -1,0 +1,25 @@
+---
+/**
+ * Footer override.
+ *
+ * Wraps Starlight's default Footer unmodified, and appends a disclaimer
+ * callout communicating that this site is community-derived from the
+ * bf6-portal-mod-types / bf6-portal-utils npm packages, not an official
+ * EA/DICE resource. Styled in src/styles/theme/chrome.css under
+ * "Footer disclaimer callout".
+ */
+import Default from '@astrojs/starlight/components/Footer.astro';
+---
+
+<Default {...Astro.props}><slot /></Default>
+<div class="wd-footer-disclaimer">
+  <p>
+    These docs are generated from the community npm packages
+    <code>bf6-portal-mod-types</code> and <code>bf6-portal-utils</code>.
+    Accuracy tracks those packages' current versions — if something here
+    doesn't match what you see in-game, check the
+    <a href="https://portal.battlefield.com/" target="_blank" rel="noopener noreferrer">official Portal documentation</a>
+    before assuming a bug. This is a community resource and is not
+    affiliated with, endorsed by, or associated with EA or DICE.
+  </p>
+</div>
