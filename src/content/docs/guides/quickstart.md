@@ -10,7 +10,7 @@ was compiled against `bf6-portal-mod-types@4.3.0` and
 
 ## 1. Project layout
 
-```code
+```txt
 my-mode/
 ├── src/
 │   ├── config/

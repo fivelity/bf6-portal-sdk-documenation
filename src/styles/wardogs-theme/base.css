@@ -1,7 +1,9 @@
 /* ==========================================================================
-   FRONTLINE HUD THEME — 02 · BASE
-   Same contract as wardogs base.css: unlayered so it beats Starlight's
-   @layer starlight.* without !important anywhere.
+   WARDOGS THEME — 02 · BASE
+   Typography, canvas, focus, selection, scrollbars, reduced motion.
+   These rules are UNLAYERED on purpose: Starlight ships everything inside
+   `@layer starlight.*`, and unlayered CSS always wins over layered CSS, so
+   no `!important` is ever needed anywhere in this theme.
    ========================================================================== */
 
 html {
@@ -19,9 +21,8 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Canvas texture: faint HUD grid + two status-colour glows (cyan/amber)
-   instead of the manifest's soft brass/blue radial pair. Grid uses a
-   repeating linear-gradient pair so it reads as graph paper, not noise. */
+/* Subtle canvas texture — two soft radial glows, fixed, non-interactive.
+   Painted on a pseudo-element so it never affects layout or paint of content. */
 body::before {
   content: '';
   position: fixed;
@@ -29,28 +30,23 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 18% 10%, var(--wd-canvas-glow-a), transparent 42%),
-    radial-gradient(circle at 90% 85%, var(--wd-canvas-glow-b), transparent 42%),
-    repeating-linear-gradient(0deg, var(--wd-grid-line) 0, var(--wd-grid-line) 1px, transparent 1px, transparent 64px),
-    repeating-linear-gradient(90deg, var(--wd-grid-line) 0, var(--wd-grid-line) 1px, transparent 1px, transparent 64px);
+    radial-gradient(circle at 20% 12%, var(--wd-canvas-glow-a), transparent 45%),
+    radial-gradient(circle at 88% 82%, var(--wd-canvas-glow-b), transparent 45%);
 }
 
 ::selection {
   background: var(--wd-brass);
-  color: #06121a;
+  color: #100f0c;
 }
 
-/* Focus: cyan, angular, double-ring — closer to a targeting reticle than
-   the manifest's single offset outline */
+/* Focus: brass, square, offset — matches the manifest exactly */
 :focus-visible {
   outline: 2px solid var(--wd-brass);
   outline-offset: 3px;
-  border-radius: 0;
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--wd-brass) 20%, transparent);
+  border-radius: var(--wd-radius);
 }
 
-/* ---------- Headings: Oswald condensed, uppercase, tight — HUD label
-   style rather than the manifest's big display type ---------- */
+/* ---------- Headings: Big Shoulders Display, tight leading ---------- */
 .sl-markdown-content h1,
 .sl-markdown-content h2,
 .sl-markdown-content h3,
@@ -59,69 +55,61 @@ body::before {
 .sl-markdown-content h6,
 h1#_top {
   font-family: var(--wd-font-display);
-  font-weight: 600;
-  letter-spacing: 0.015em;
+  font-weight: 800;
+  letter-spacing: 0.01em;
   color: var(--sl-color-white);
-  text-transform: uppercase;
 }
 
 .sl-markdown-content h2 {
-  font-size: clamp(1.6rem, 2.6vw, 2.15rem);
-  line-height: 1.05;
-  padding-bottom: 0.5rem;
-  padding-left: 0.7rem;
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+  line-height: 0.98;
+  padding-bottom: 0.4rem;
   border-bottom: var(--wd-rule);
-  border-left: 3px solid var(--wd-brass);
 }
 .sl-markdown-content h3 {
-  font-size: 1.28rem;
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: 0.01em;
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.02;
 }
 .sl-markdown-content h4 {
-  font-size: 1.02rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 .sl-markdown-content h5,
 .sl-markdown-content h6 {
   font-family: var(--wd-font-mono);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--wd-muted);
 }
 
-/* Page title — HUD readout label ("SECTOR // Guide Name") via the same
-   --wd-kicker var Head.astro already sets; no component change needed */
+/* Page title — with a scoped "doc kicker" (manifest's .doc-number). Uses
+   the site title via CSS var set in Head override, so it is NOT hard-coded
+   into every heading like a bare `h1::before` would be. */
 h1#_top {
-  font-size: clamp(2.1rem, 4.4vw, 3.1rem);
-  line-height: 0.98;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  line-height: 0.94;
   margin-top: 0.4rem;
 }
 h1#_top::before {
-  content: var(--wd-kicker, 'BF6 PORTAL SDK');
-  display: flex;
-  align-items: center;
-  gap: 0.55em;
-  margin-bottom: 0.65rem;
+  content: var(--wd-kicker, 'BF6 Portal SDK');
+  display: block;
+  margin-bottom: 0.7rem;
   font-family: var(--wd-font-mono);
   font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--sl-color-accent);
 }
-h1#_top::after {
-  /* HUD corner tick under the kicker line, purely decorative */
-  content: '';
-}
+/* …but never on the splash landing page, whose hero has its own eyebrow */
 [data-has-hero] h1#_top::before {
   content: none;
 }
 
+/* Anchor-heading hover affordance */
 .sl-anchor-link {
   color: var(--wd-muted);
 }
@@ -143,7 +131,7 @@ h1#_top::after {
 }
 .sl-markdown-content a:not(.not-content a):not(.sl-anchor-link) {
   color: var(--sl-color-text-accent);
-  text-decoration-color: color-mix(in srgb, var(--wd-brass) 50%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--wd-brass) 45%, transparent);
   text-underline-offset: 0.2em;
   transition: text-decoration-color var(--wd-fast) var(--wd-ease);
 }
@@ -151,39 +139,39 @@ h1#_top::after {
   text-decoration-color: currentColor;
 }
 
+/* Horizontal rules read as manifest dividers */
 .sl-markdown-content hr {
   border: 0;
   border-top: var(--wd-rule);
   margin-block: 2.5rem;
 }
 
-/* Blockquote: HUD callout — cyan rail, angular corner cut */
+/* Blockquote: plate with brass rail */
 .sl-markdown-content blockquote {
   margin-inline: 0;
   padding: 0.9rem 1.2rem;
   border-inline-start: 3px solid var(--wd-brass);
   background: var(--wd-plate);
   color: var(--sl-color-text);
-  clip-path: var(--wd-clip-notch-tr);
 }
 
-/* ---------- Inline code ---------- */
+/* ---------- Inline code: brass on tinted plate ---------- */
 .sl-markdown-content :not(pre) > code {
   font-family: var(--wd-font-mono);
   font-size: 0.86em;
   color: var(--wd-brass-bright);
   background: var(--sl-color-bg-inline-code);
   padding: 1.5px 5px;
-  border-radius: 0;
-  border: 1px solid color-mix(in srgb, var(--wd-brass) 25%, transparent);
+  border-radius: var(--wd-radius);
+  border: 0;
 }
+/* keep inline code readable inside headings + links */
 .sl-markdown-content h1 code,
 .sl-markdown-content h2 code,
 .sl-markdown-content h3 code,
 .sl-markdown-content h4 code {
-  font-size: 0.78em;
+  font-size: 0.8em;
   letter-spacing: 0;
-  text-transform: none;
 }
 
 kbd {
@@ -192,12 +180,12 @@ kbd {
   padding: 1px 6px;
   border: var(--wd-rule-strong);
   border-bottom-width: 2px;
-  border-radius: 0;
+  border-radius: var(--wd-radius);
   background: var(--wd-plate);
   color: var(--sl-color-white);
 }
 
-/* ---------- Scrollbars ---------- */
+/* ---------- Scrollbars (thin, hairline) ---------- */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--wd-hairline-strong) transparent;

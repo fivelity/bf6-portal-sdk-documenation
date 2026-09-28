@@ -1,0 +1,20 @@
+---
+/**
+ * SocialIcons override.
+ *
+ * Starlight renders this slot inside the header's right-hand group, directly
+ * beside the GitHub icon and theme select. Overriding it (instead of wrapping
+ * the whole Header) means the build-provenance ribbons sit exactly where the
+ * header's own controls do, at every breakpoint Starlight supports.
+ *
+ * The default social icons render unmodified after the ribbons.
+ * Build-time only — no client JS.
+ */
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+import BuildBadges from './BuildBadges.astro';
+---
+
+<div class="wd-header-right">
+  <BuildBadges />
+  <Default {...Astro.props}><slot /></Default>
+</div>

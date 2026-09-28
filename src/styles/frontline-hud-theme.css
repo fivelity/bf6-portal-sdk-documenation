@@ -1,0 +1,20 @@
+/* ==========================================================================
+   FRONTLINE HUD THEME — entry
+   Drop-in replacement for src/styles/wardogs-theme.css. Registered the
+   same way in astro.config.mjs -> starlight({ customCss: [...] }).
+
+   Fonts are self-hosted via Fontsource, same pattern as the manifest theme:
+     @fontsource-variable/oswald        (replaces big-shoulders-display)
+     @fontsource-variable/inter         (unchanged)
+     @fontsource-variable/jetbrains-mono (unchanged)
+   Install: pnpm add @fontsource-variable/oswald
+   Then update astro.config.mjs's customCss array — see README snippet
+   below this file's header in the handoff notes.
+   ========================================================================== */
+
+@import './theme/tokens.css';
+@import './theme/base.css';
+@import './theme/chrome.css';
+@import './theme/content.css';
+@import './theme/hero.css';
+@import './theme/reference.css';

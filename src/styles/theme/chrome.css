@@ -1,13 +1,11 @@
 /* ==========================================================================
-   WARDOGS THEME — 03 · CHROME
+   FRONTLINE HUD THEME — 03 · CHROME
    Header, sidebar index, on-this-page TOC, search dialog, pagination.
+   Structurally identical selectors to wardogs chrome.css — only the visual
+   treatment changes (angular vs. pill, cyan vs. brass, tighter uppercase
+   mono labels evoking a HUD sidebar readout).
    ========================================================================== */
 
-/* ---------- Header ----------
-   Starlight renders <header class="header"><div class="header">…</div></header>
-   — BOTH elements carry `.header`. A bare `.header` rule therefore paints
-   its border twice (outer + inner), which read as a doubled underline.
-   Scope to the outer <header> only and neutralise the inner wrapper. */
 header.header {
   border-bottom: var(--wd-rule);
   background: var(--sl-color-bg-nav);
@@ -15,128 +13,11 @@ header.header {
 header.header > .header {
   border-bottom: 0;
 }
-
-/* ---------- Build provenance badge strip ("ribbons") ----------
-   Rectangular, embossed-metal chips for build metadata. */
-.wd-header-wrap {
-  display: flex;
-  flex-direction: column;
-}
-.wd-header-badges-row {
-  display: flex;
-  justify-content: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-  padding: 0.4rem 1rem 0.55rem;
-  background: var(--wd-bg-inset);
-  border-bottom: var(--wd-rule);
-}
-.wd-build-badges {
-  display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.wd-ribbon {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.05rem;
-  min-width: 5.5rem;
-  padding: 0.22rem 0.55rem 0.24rem;
-  border-radius: 1px;
-  border: 1px solid var(--wd-hairline-strong);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 40%),
-    linear-gradient(135deg, var(--wd-bg-raised) 0%, var(--wd-bg-inset) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-    0 1px 2px rgba(0, 0, 0, 0.4);
-  overflow: hidden;
-  cursor: default;
-}
-.wd-ribbon::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.05) 35%,
-    rgba(255, 255, 255, 0.12) 45%,
-    rgba(255, 255, 255, 0.05) 55%,
-    transparent 100%
-  );
-  mix-blend-mode: overlay;
-}
-.wd-ribbon::before {
-  content: '';
-  position: absolute;
-  inset-block: 0;
-  inset-inline-start: 0;
-  width: 2px;
-  background: var(--wd-brass);
-  opacity: 0.75;
-}
-.wd-build-badges > .wd-ribbon:nth-child(2)::before {
-  background: var(--wd-lonestar);
-}
-.wd-build-badges > .wd-ribbon:nth-child(3)::before {
-  background: var(--wd-manticore);
-}
-.wd-ribbon__label {
-  position: relative;
-  font-family: var(--wd-font-mono);
-  font-size: 0.56rem;
-  font-weight: 500;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--wd-muted);
-  line-height: 1.1;
-}
-.wd-ribbon__value {
-  position: relative;
-  font-family: var(--wd-font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  color: var(--wd-brass-bright);
-  line-height: 1.15;
-  white-space: nowrap;
-}
-:root[data-theme='light'] .wd-ribbon {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 40%),
-    linear-gradient(135deg, #ffffff 0%, #f1ece0 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 0 rgba(16, 15, 12, 0.08),
-    0 1px 2px rgba(16, 15, 12, 0.1);
-}
-@media (max-width: 40rem) {
-  .wd-header-badges-row {
-    padding: 0.3rem 0.5rem;
-  }
-  .wd-ribbon {
-    min-width: 4.5rem;
-    padding: 0.18rem 0.45rem 0.2rem;
-  }
-  .wd-ribbon__label {
-    font-size: 0.52rem;
-  }
-  .wd-ribbon__value {
-    font-size: 0.66rem;
-  }
-}
-
 .site-title {
   font-family: var(--wd-font-display);
-  font-weight: 800;
-  font-size: 1.45rem;
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--sl-color-white);
 }
@@ -144,19 +25,18 @@ header.header > .header {
   color: var(--wd-brass-bright);
 }
 
-/* ---------- Sidebar: manifest "index" ---------- */
+/* ---------- Sidebar ---------- */
 #starlight__sidebar,
 .sidebar-pane {
   background: var(--sl-color-bg-sidebar);
   border-inline-end: var(--wd-rule);
 }
 
-/* Top-level group labels → mono, uppercase, muted (manifest .index-group-label) */
 .sidebar-content .large {
   font-family: var(--wd-font-mono);
-  font-size: 0.66rem;
+  font-size: 0.65rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--wd-muted);
 }
@@ -167,10 +47,10 @@ header.header > .header {
   color: var(--wd-paper-dim);
 }
 
-/* Links: square, 2px left rail that turns brass when current */
+/* Links: no pill, no rounded rail — a hard 2px cyan tick when current */
 .sidebar-content a {
   font-size: 0.86rem;
-  border-radius: var(--wd-radius);
+  border-radius: 0;
   border-inline-start: 2px solid transparent;
   color: var(--wd-paper-dim);
   transition:
@@ -180,33 +60,21 @@ header.header > .header {
 }
 .sidebar-content a:hover {
   color: var(--sl-color-white);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(53, 208, 224, 0.05);
 }
 :root[data-theme='light'] .sidebar-content a:hover {
-  background: rgba(16, 15, 12, 0.04);
+  background: rgba(10, 125, 140, 0.05);
 }
 .sidebar-content a[aria-current='page'] {
   color: var(--sl-color-white);
-  background: color-mix(in srgb, var(--wd-brass) 9%, transparent);
+  background: color-mix(in srgb, var(--wd-brass) 10%, transparent);
   border-inline-start-color: var(--wd-brass);
   font-weight: 500;
 }
-/* Starlight paints current links with accent-bg + inverted text by default;
-   restore legible text on our tinted plate. */
 .sidebar-content a[aria-current='page']:not(.not-content) {
   color: var(--sl-color-white);
 }
 
-/* Nested lists.
-   Starlight draws one guide rail per nesting level (`border-inline-start` on
-   every `ul ul li`). In a 3-4 level tree that is 3-4 parallel vertical lines
-   a few pixels apart, which reads as "duplicated" lines. This theme
-   previously ALSO added a border on the `ul` itself, doubling them again.
-
-   Now: no rail on the `ul`, and only ONE rail in the whole nested column —
-   the one belonging to the innermost list that holds links (`ul` whose
-   children are plain <li><a> rows). Outer levels are separated by indent
-   alone. */
 .sidebar-content ul ul {
   border: 0;
   margin-inline-start: 0;
@@ -217,15 +85,11 @@ header.header > .header {
   margin-inline-start: 0.4rem;
   padding-inline-start: 0;
 }
-/* The one rail: on link rows that sit directly inside a nested list. */
 .sidebar-content ul ul > li:has(> a) {
   border-inline-start: 1px solid var(--wd-hairline);
   padding-inline-start: 0.4rem;
   margin-inline-start: 0.4rem;
 }
-/* The current page already carries its own 2px brass accent on the <a>
-   (see `a[aria-current='page']` below). Let that be the only mark on the
-   active row instead of drawing the rail right beside it. */
 .sidebar-content ul ul > li:has(> a[aria-current='page']) {
   border-inline-start-color: transparent;
 }
@@ -234,7 +98,7 @@ header.header > .header {
 starlight-toc a,
 mobile-starlight-toc a {
   font-size: 0.8rem;
-  border-radius: var(--wd-radius);
+  border-radius: 0;
   color: var(--wd-muted);
   transition: color var(--wd-fast) var(--wd-ease);
 }
@@ -248,9 +112,9 @@ mobile-starlight-toc a[aria-current='true'] {
 }
 .right-sidebar-panel h2 {
   font-family: var(--wd-font-mono);
-  font-size: 0.66rem;
+  font-size: 0.65rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--wd-muted);
 }
@@ -260,11 +124,12 @@ mobile-starlight-toc a[aria-current='true'] {
 
 /* ---------- Search button + Pagefind dialog ---------- */
 site-search button[data-open-modal] {
-  border-radius: var(--wd-radius);
+  border-radius: 0;
   border: var(--wd-rule-strong);
   background: var(--wd-plate);
   font-family: var(--wd-font-mono);
   font-size: 0.78rem;
+  clip-path: var(--wd-clip-sm);
 }
 site-search button[data-open-modal]:hover {
   border-color: var(--wd-brass);
@@ -274,7 +139,7 @@ site-search kbd {
 }
 
 dialog[aria-label] {
-  border-radius: var(--wd-radius);
+  border-radius: 0;
   background: var(--sl-color-bg);
   box-shadow: var(--sl-shadow-lg);
 }
@@ -284,26 +149,28 @@ dialog[aria-label] {
   --pagefind-ui-background: var(--wd-plate);
   --pagefind-ui-border: var(--wd-hairline-strong);
   --pagefind-ui-tag: var(--wd-hairline);
-  --pagefind-ui-border-radius: 2px;
+  --pagefind-ui-border-radius: 0px;
   --pagefind-ui-font: var(--wd-font-body);
 }
 #starlight__search .pagefind-ui__result-title a {
   font-family: var(--wd-font-display);
   font-weight: 700;
   letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 #starlight__search .pagefind-ui__result-excerpt mark {
-  background: color-mix(in srgb, var(--wd-brass) 28%, transparent);
+  background: color-mix(in srgb, var(--wd-brass) 30%, transparent);
   color: var(--sl-color-white);
   padding-inline: 2px;
 }
 
-/* ---------- Pagination: manifest plates ---------- */
+/* ---------- Pagination: angular HUD tiles ---------- */
 .pagination-links a {
-  border-radius: var(--wd-radius);
+  border-radius: 0;
   border: var(--wd-rule-strong);
   background: var(--wd-plate);
   box-shadow: none;
+  clip-path: var(--wd-clip-md);
   transition:
     border-color var(--wd-fast) var(--wd-ease),
     background var(--wd-fast) var(--wd-ease);
@@ -315,14 +182,16 @@ dialog[aria-label] {
 .pagination-links .link-title {
   font-family: var(--wd-font-display);
   font-weight: 700;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
   color: var(--sl-color-white);
 }
 
 /* ---------- Theme / language selects ---------- */
 starlight-theme-select select,
 starlight-lang-select select {
-  border-radius: var(--wd-radius);
+  border-radius: 0;
   font-family: var(--wd-font-mono);
   font-size: 0.78rem;
 }
@@ -335,12 +204,8 @@ footer .meta {
   letter-spacing: 0.03em;
 }
 
-/* ---------- Sidebar: sub-group labels + long symbol names ----------
-   Nested group labels (Functions, Enumerations, module names) were styled as
-   the same tiny uppercase mono as the top-level headings, and Starlight's
-   `overflow-wrap: anywhere` then broke them mid-word ("Enumera-tions") once
-   deep nesting had eaten the width. Sub-groups get a calmer label, and
-   symbol names only wrap at a real boundary. */
+/* ---------- Sub-group labels + long symbol names (unchanged logic,
+   restyled) ---------- */
 .sidebar-content details details > summary .large {
   font-family: var(--wd-font-body);
   font-size: 0.82rem;
@@ -352,12 +217,6 @@ footer .meta {
 .sidebar-content details details > summary:hover .large {
   color: var(--sl-color-white);
 }
-/* Long PascalCase symbol names ("ApplyAreaImpulseAndDamage") have no spaces,
-   so the browser can only wrap them by splitting a word — Starlight's
-   `overflow-wrap: anywhere` does exactly that ("...Damag / e"). Guide titles
-   ("Player / Vehicle / Game Mode Interfaces") contain spaces and should keep
-   wrapping normally. So: wrap only at real break opportunities (spaces),
-   and let a single unbreakable identifier clip with an ellipsis instead. */
 .sidebar-content li {
   overflow-wrap: normal;
 }
@@ -368,34 +227,11 @@ footer .meta {
   text-overflow: ellipsis;
 }
 
-/* Count badges on sub-groups: quiet, not a loud pill */
 .sidebar-content details details .sl-badge {
   font-size: 0.6rem;
   padding: 0 0.4em;
   background: transparent;
   border-color: var(--wd-hairline-strong);
   color: var(--wd-muted);
-}
-
-/* ---------- Footer disclaimer callout ---------- */
-.wd-footer-disclaimer {
-  border-top: var(--wd-rule);
-  background: var(--wd-bg-inset);
-  padding: 0.9rem 1.5rem;
-}
-.wd-footer-disclaimer p {
-  max-width: 60rem;
-  margin-inline: auto;
-  font-size: 0.76rem;
-  line-height: 1.6;
-  color: var(--wd-muted);
-  text-align: center;
-}
-.wd-footer-disclaimer code {
-  font-family: var(--wd-font-mono);
-  color: var(--wd-brass-bright);
-}
-.wd-footer-disclaimer a {
-  color: var(--wd-lonestar);
-  text-decoration-color: color-mix(in srgb, var(--wd-lonestar) 45%, transparent);
+  border-radius: 0;
 }

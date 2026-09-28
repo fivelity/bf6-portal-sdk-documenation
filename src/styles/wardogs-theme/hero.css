@@ -1,8 +1,7 @@
 /* ==========================================================================
-   FRONTLINE HUD THEME — 05 · HERO / SPLASH
-   Deployment-screen hero: mono eyebrow with bracket ticks, huge condensed
-   uppercase title, angular action buttons, corner-bracketed HUD frame
-   instead of the manifest's scanline frame.
+   WARDOGS THEME — 05 · HERO / SPLASH
+   Manifest hero: eyebrow rule, huge condensed display title, mono stat
+   strip, scanline HUD frame.
    ========================================================================== */
 
 [data-has-hero] .hero {
@@ -11,25 +10,26 @@
   gap: clamp(1.5rem, 4vw, 3rem);
 }
 
+/* Eyebrow: mono, brass, with leading rule */
 [data-has-hero] .hero .copy::before {
-  content: var(--wd-hero-eyebrow, '[ BATTLEFIELD 6 · PORTAL SDK REFERENCE ]');
+  content: var(--wd-hero-eyebrow, 'Battlefield 6 Portal · SDK Reference');
   display: flex;
   align-items: center;
   gap: 0.7rem;
   font-family: var(--wd-font-mono);
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--wd-brass);
 }
 
 [data-has-hero] .hero h1 {
   font-family: var(--wd-font-display);
-  font-weight: 700;
-  font-size: clamp(3rem, 8vw, 5.75rem);
-  line-height: 0.9;
-  letter-spacing: 0.01em;
+  font-weight: 800;
+  font-size: clamp(3.4rem, 9vw, 6.75rem);
+  line-height: 0.86;
+  letter-spacing: 0.005em;
   color: var(--sl-color-white);
   text-transform: uppercase;
 }
@@ -41,17 +41,16 @@
   color: var(--wd-paper-dim);
 }
 
-/* Hero actions: angular clipped plates instead of pills */
+/* Hero actions: square plates instead of pills */
 [data-has-hero] .hero .sl-link-button {
-  border-radius: 0;
+  border-radius: var(--wd-radius);
   font-family: var(--wd-font-mono);
   font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 0.8em 1.4em;
   border: 1px solid var(--wd-hairline-strong);
-  clip-path: var(--wd-clip-md);
   transition:
     background var(--wd-fast) var(--wd-ease),
     border-color var(--wd-fast) var(--wd-ease),
@@ -60,7 +59,7 @@
 [data-has-hero] .hero .sl-link-button.primary {
   background: var(--wd-brass);
   border-color: var(--wd-brass);
-  color: #06121a;
+  color: #100f0c;
 }
 [data-has-hero] .hero .sl-link-button.primary:hover {
   background: var(--wd-brass-bright);
@@ -77,25 +76,25 @@
   color: var(--wd-brass-bright);
 }
 
-/* Landing body h2s keep the HUD section rhythm from base.css automatically
-   (border-left + border-bottom already applied globally) */
+/* Landing body: give h2s the manifest section rhythm */
+[data-has-hero] .sl-markdown-content h2 {
+  border-bottom: var(--wd-rule);
+}
 
-/* ---------- Decorative HUD frame (opt-in: <div class="wd-hud">…) ----------
-   Corner brackets (targeting-reticle style) replace the manifest's
-   scanline-only treatment; scanlines are kept as a secondary texture. */
+/* ---------- Decorative HUD frame (opt-in: <div class="wd-hud">…) ---------- */
 .wd-hud {
   position: relative;
   aspect-ratio: 16 / 10;
   overflow: hidden;
   border: var(--wd-rule-strong);
-  background: linear-gradient(160deg, #101c20, #070a0c 72%);
+  background: linear-gradient(155deg, #1a1712, #0d0c09 70%);
 }
 .wd-hud::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.35;
+  opacity: 0.4;
   mix-blend-mode: overlay;
   background: repeating-linear-gradient(
     0deg,
@@ -104,21 +103,4 @@
     transparent 1px,
     transparent 3px
   );
-}
-.wd-hud::before {
-  /* Four corner brackets, 18px legs, 2px cyan stroke */
-  content: '';
-  position: absolute;
-  inset: 14px;
-  pointer-events: none;
-  background:
-    linear-gradient(var(--wd-bracket), var(--wd-bracket)) top left / 2px 18px no-repeat,
-    linear-gradient(var(--wd-bracket), var(--wd-bracket)) top left / 18px 2px no-repeat,
-    linear-gradient(var(--wd-bracket), var(--wd-bracket)) top right / 2px 18px no-repeat,
-    linear-gradient(var(--wd-bracket), var(--wd-bracket)) top right / 18px 2px no-repeat,
-    linear-gradient(var(--wd-bracket), var(--wd-bracket)) bottom left / 2px 18px no-repeat,
-    linear-gradient(var(--wd-bracket), var(--wd-bracket)) bottom left / 18px 2px no-repeat,
-    linear-gradient(var(--wd-bracket), var(--wd-bracket)) bottom right / 2px 18px no-repeat,
-    linear-gradient(var(--wd-bracket), var(--wd-bracket)) bottom right / 18px 2px no-repeat;
-  opacity: 0.85;
 }

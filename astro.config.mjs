@@ -60,15 +60,16 @@ export default defineConfig({
       // Order matters: fonts first, then the theme entry.
       // Fontsource variable fonts are self-hosted → no third-party request.
       customCss: [
+        '@fontsource-variable/oswald',
         '@fontsource-variable/big-shoulders-display',
         '@fontsource-variable/inter',
         '@fontsource-variable/jetbrains-mono',
-        './src/styles/wardogs-theme.css',
+        './src/styles/frontline-hud-theme.css',
       ],
 
       components: {
         Head: './src/components/Head.astro',
-        Header: './src/components/Header.astro',
+        SocialIcons: './src/components/SocialIcons.astro',
         Footer: './src/components/Footer.astro',
         Sidebar: './src/components/ReferenceSidebar.astro',
         MarkdownContent: './src/components/MarkdownContent.astro',
