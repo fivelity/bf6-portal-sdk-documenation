@@ -1,0 +1,288 @@
+/* ==========================================================================
+   SIDEBAR NAVIGATION — filter box, scroll containment, edge fades, sticky
+   group headings, active-item highlighting, icon alignment.
+   Paired with src/components/ReferenceSidebar.astro, which renders the
+   filter toolbar and drives the scroll behaviour below via JS.
+   Palette-agnostic — reads --wd-* tokens only.
+   ========================================================================== */
+
+#starlight__sidebar,
+.sidebar-pane {
+  background: var(--sl-color-bg-sidebar);
+  border-inline-end: var(--wd-rule);
+}
+
+/* G1 — wheel input never leaks into the page scroll */
+.sidebar-pane {
+  overscroll-behavior: contain;
+}
+
+/* ---------- Filter toolbar (rendered by ReferenceSidebar.astro) ---------- */
+.wd-sb-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: var(--wd-sb-toolbar-h);
+  margin: -1rem calc(-1 * var(--sl-sidebar-pad-x)) 0.75rem;
+  padding: 0 var(--sl-sidebar-pad-x);
+  background: var(--sl-color-bg-sidebar);
+  border-bottom: var(--wd-rule);
+}
+.wd-sb-filter {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.wd-sb-filter svg {
+  position: absolute;
+  inset-inline-start: 0.55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--wd-muted);
+  pointer-events: none;
+}
+.wd-sb-filter input {
+  width: 100%;
+  height: 2.05rem;
+  padding: 0 1.9rem 0 2rem;
+  border: var(--wd-rule-strong);
+  border-radius: var(--wd-radius);
+  background: var(--wd-plate);
+  color: var(--sl-color-white);
+  font-family: var(--wd-font-body);
+  font-size: 0.82rem;
+  transition: border-color var(--wd-fast) var(--wd-ease);
+}
+.wd-sb-filter input:focus-visible {
+  outline: none;
+  border-color: var(--wd-accent);
+  box-shadow: var(--wd-focus-halo);
+}
+.wd-sb-filter input::placeholder {
+  color: var(--wd-muted);
+}
+.wd-sb-filter-clear {
+  position: absolute;
+  inset-inline-end: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 0;
+  border-radius: var(--wd-radius);
+  background: transparent;
+  color: var(--wd-muted);
+  cursor: pointer;
+}
+.wd-sb-filter-clear:hover {
+  color: var(--sl-color-white);
+  background: var(--wd-hairline);
+}
+.wd-sb-filter.has-value .wd-sb-filter-clear {
+  display: inline-flex;
+}
+.wd-sb-filter-count {
+  flex-shrink: 0;
+  font-family: var(--wd-font-mono);
+  font-size: 0.68rem;
+  color: var(--wd-muted);
+  white-space: nowrap;
+}
+
+/* Filtering state: hide non-matches, force-open ancestors of matches */
+.sidebar-content[data-filtering='true'] li[data-sb-match='false'] {
+  display: none;
+}
+.sidebar-content[data-filtering='true'] li[data-sb-match='true'] mark {
+  background: color-mix(in srgb, var(--wd-accent) 35%, transparent);
+  color: var(--sl-color-white);
+  border-radius: 2px;
+}
+.wd-sb-empty {
+  display: none;
+  padding: 1.5rem 0.5rem;
+  text-align: center;
+  color: var(--wd-muted);
+  font-size: 0.84rem;
+}
+.sidebar-content[data-filtering='true'][data-sb-empty='true'] .wd-sb-empty {
+  display: block;
+}
+.sidebar-content[data-filtering='true'][data-sb-empty='true'] .top-level {
+  display: none;
+}
+
+/* ---------- Edge fades (G2) ---------- */
+.sidebar-pane::before,
+.sidebar-pane::after {
+  content: '';
+  position: sticky;
+  z-index: 5;
+  display: block;
+  height: 1.75rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--wd-fast) var(--wd-ease);
+}
+.sidebar-pane::before {
+  top: 0;
+  margin-bottom: -1.75rem;
+  background: linear-gradient(to bottom, var(--sl-color-bg-sidebar), transparent);
+}
+.sidebar-pane::after {
+  bottom: 0;
+  margin-top: -1.75rem;
+  background: linear-gradient(to top, var(--sl-color-bg-sidebar), transparent);
+}
+.sidebar-pane[data-more-above]::before,
+.sidebar-pane[data-more-below]::after {
+  opacity: 1;
+}
+
+/* ---------- Group labels ---------- */
+.sidebar-content .large {
+  font-family: var(--wd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  /* was --wd-muted at 0.66rem — under 4.5:1 in both palettes at this size.
+     paper-dim clears AA comfortably while staying visually secondary. */
+  color: var(--wd-paper-dim);
+}
+.sidebar-content details > summary:hover .large {
+  color: var(--sl-color-white);
+}
+
+/* G3 — sticky group headings, solid background, depth via z-index */
+.sidebar-content details > summary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--sl-color-bg-sidebar);
+  padding-block: 0.5rem;
+}
+.sidebar-content details details > summary { z-index: 2; }
+.sidebar-content details details details > summary { z-index: 3; }
+
+/* Open/active-ancestor emphasis: a top-level group that is expanded, or
+   contains the current page, gets a quiet accent rail so it visually
+   separates from sibling groups the reader isn't inside right now. */
+.sidebar-content > .sidebar-content > ul.top-level > li > details[open] > summary,
+.sidebar-content ul.top-level > li > details[open] > summary {
+  border-inline-start: 2px solid var(--wd-accent);
+  padding-inline-start: calc(var(--sl-sidebar-item-padding-inline, 0.5rem) - 2px);
+}
+.sidebar-content ul.top-level > li > details:not([open]) > summary {
+  border-inline-start: 2px solid transparent;
+}
+.sidebar-content ul.top-level > li > details[open] > summary .large {
+  color: var(--sl-color-white);
+}
+
+/* ---------- Links ---------- */
+.sidebar-content a {
+  font-size: 0.86rem;
+  border-radius: var(--wd-radius);
+  border-inline-start: 2px solid transparent;
+  color: var(--wd-paper-dim);
+  transition:
+    color var(--wd-fast) var(--wd-ease),
+    background var(--wd-fast) var(--wd-ease),
+    border-color var(--wd-fast) var(--wd-ease);
+}
+.sidebar-content a:hover {
+  color: var(--sl-color-white);
+  background: color-mix(in srgb, var(--wd-accent) 6%, transparent);
+}
+.sidebar-content a[aria-current='page'] {
+  color: var(--sl-color-white);
+  background: color-mix(in srgb, var(--wd-accent) 12%, transparent);
+  border-inline-start-color: var(--wd-accent);
+  font-weight: 500;
+}
+.sidebar-content a[aria-current='page']:not(.not-content) {
+  color: var(--sl-color-white);
+}
+
+.sidebar-content ul ul {
+  border: 0;
+  margin-inline-start: 0;
+}
+.sidebar-content ul ul li {
+  --sl-sidebar-item-padding-inline: 0.4rem;
+  border-inline-start: 0;
+  margin-inline-start: 0.4rem;
+  padding-inline-start: 0;
+}
+.sidebar-content ul ul > li:has(> a) {
+  border-inline-start: 1px solid var(--wd-hairline);
+  padding-inline-start: 0.4rem;
+  margin-inline-start: 0.4rem;
+}
+.sidebar-content ul ul > li:has(> a[aria-current='page']) {
+  border-inline-start-color: transparent;
+}
+
+/* When the toolbar is present the ul.top-level > li + li gap (Starlight's
+   default, 0.75rem) already provides rhythm; nothing extra needed here. */
+
+/* ---------- Sub-group labels + long symbol names ---------- */
+.sidebar-content details details > summary .large {
+  font-family: var(--wd-font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--wd-paper-dim);
+}
+.sidebar-content details details > summary:hover .large {
+  color: var(--sl-color-white);
+}
+.sidebar-content li {
+  overflow-wrap: normal;
+}
+.sidebar-content li > a > span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-content details details .sl-badge {
+  font-size: 0.6rem;
+  padding: 0 0.4em;
+  background: transparent;
+  border-color: var(--wd-hairline-strong);
+  color: var(--wd-muted);
+  border-radius: var(--wd-radius);
+}
+
+/* ---------- Top-level icons (ReferenceSidebar.astro injects these) ----------
+   Previously a bare inline-flex with no sizing rule, so the icon's own
+   viewBox size won a race against line-height and sat a few px off-centre.
+   Fixed size + inline-flex centering + nudged up half a pixel of optical
+   correction for the caret's baseline. */
+.sidebar-content [data-injected-sidebar-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-inline-end: 0.5em;
+  vertical-align: -0.2em;
+  flex-shrink: 0;
+  color: var(--wd-accent);
+}
+.sidebar-content [data-injected-sidebar-icon] svg {
+  width: 100%;
+  height: 100%;
+}

@@ -1,15 +1,21 @@
 ---
-// Wraps Starlight's default Sidebar to add an icon next to each top-level
-// sidebar item (group or link), keyed by that item's own label text.
+// Wraps Starlight's default Sidebar to add:
+//   1. top-level icons, keyed by label text (unchanged approach from the
+//      original component — see ICON_BY_LABEL below);
+//   2. an incremental filter box above the tree, for finding one symbol
+//      among hundreds without scrolling;
+//   3. scroll UX for the long generated lists: contained overscroll, edge
+//      fades signalling more content, sticky group headings, and
+//      auto-scroll to the active entry on load.
 //
-// Why not the sidebar config directly: Starlight's sidebar schema has no
-// `icon` field on groups or links (only `label`, `badge`, `collapsed`,
-// `translations`, `attrs`) — see node_modules/@astrojs/starlight/dist/schemas/sidebar.js.
-// This wrapper renders the real <Sidebar /> unmodified, then a tiny inline
-// script tags each *top-level* entry with a matching icon after hydration.
-// It's keyed by label text rather than DOM position, so reordering items
-// in astro.config.mjs's sidebar array doesn't break anything — only
-// renaming a top-level label requires updating ICON_BY_LABEL below.
+// Why not a sidebar config `icon` field: Starlight's sidebar schema has no
+// `icon` on groups or links (only `label`, `badge`, `collapsed`,
+// `translations`, `attrs`) — see
+// node_modules/@astrojs/starlight/dist/schemas/sidebar.js. This wrapper
+// renders the real <Sidebar/> unmodified and layers everything else on
+// top with a small inline script, keyed by label/text content rather than
+// DOM position, so re-ordering sidebar.astro.config.mjs entries never
+// breaks it.
 import Sidebar from '@astrojs/starlight/components/Sidebar.astro';
 import { Icon } from '@astrojs/starlight/components';
 
@@ -22,7 +28,30 @@ const ICON_BY_LABEL: Record<string, string> = {
 };
 ---
 
+<div class="wd-sb-toolbar">
+  <div class="wd-sb-filter" id="wd-sb-filter">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
+      <path d="m20 20-3.2-3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </svg>
+    <input
+      type="text"
+      id="wd-sb-filter-input"
+      placeholder="Filter this menu…"
+      aria-label="Filter sidebar navigation"
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <button type="button" class="wd-sb-filter-clear" id="wd-sb-filter-clear" aria-label="Clear filter">
+      <Icon name="close" size="0.85rem" />
+    </button>
+  </div>
+  <span class="wd-sb-filter-count" id="wd-sb-filter-count" aria-live="polite"></span>
+</div>
+
 <Sidebar />
+
+<p class="wd-sb-empty" id="wd-sb-empty">No matches. Try a different term, or clear the filter.</p>
 
 {
   Object.entries(ICON_BY_LABEL).map(([label, icon]) => (
@@ -33,13 +62,12 @@ const ICON_BY_LABEL: Record<string, string> = {
 }
 
 <script>
-  // Runs once per page load (sidebar is server-rendered per navigation in
-  // Starlight's MPA-style routing, so no need for an Astro island / client
-  // directive — a plain inline script re-runs on every page).
+  // Runs once per page load. Starlight's sidebar is server-rendered per
+  // navigation (MPA-style routing), so a plain inline module that re-runs
+  // on `astro:page-load` is enough — no client directive/hydration needed.
+
   function decorateTopLevelSidebarLabels(): void {
-    const templates = document.querySelectorAll<HTMLTemplateElement>(
-      'template[data-sidebar-icon-label]',
-    );
+    const templates = document.querySelectorAll<HTMLTemplateElement>('template[data-sidebar-icon-label]');
     if (templates.length === 0) return;
 
     const iconByLabel = new Map<string, string>();
@@ -48,34 +76,188 @@ const ICON_BY_LABEL: Record<string, string> = {
       if (label) iconByLabel.set(label, tpl.innerHTML);
     }
 
-    // Only the immediate children of the top-level <ul class="top-level">
-    // are group/link roots we want to decorate — nested sub-items are left
-    // untouched so the icon set stays limited to the three top-level groups.
     const topLevelLists = document.querySelectorAll<HTMLUListElement>('ul.top-level');
     for (const list of topLevelLists) {
       for (const li of Array.from(list.children)) {
-        const labelHost = li.querySelector<HTMLElement>(
-          ':scope > a > span, :scope > details > summary .large',
-        );
+        const labelHost = li.querySelector<HTMLElement>(':scope > a > span, :scope > details > summary .large');
         if (!labelHost) continue;
         const text = labelHost.textContent?.trim();
         if (!text) continue;
 
         const iconHtml = iconByLabel.get(text);
         if (!iconHtml) continue;
-        if (labelHost.querySelector('[data-injected-sidebar-icon]')) continue; // already done
+        if (labelHost.querySelector('[data-injected-sidebar-icon]')) continue;
 
         const wrapper = document.createElement('span');
         wrapper.setAttribute('data-injected-sidebar-icon', '');
-        wrapper.style.display = 'inline-flex';
-        wrapper.style.marginInlineEnd = '0.4em';
-        wrapper.style.verticalAlign = 'text-bottom';
         wrapper.innerHTML = iconHtml;
         labelHost.prepend(wrapper);
       }
     }
   }
 
-  decorateTopLevelSidebarLabels();
-  document.addEventListener('astro:page-load', decorateTopLevelSidebarLabels);
+  /** Wrap the first case-insensitive match of `query` in `labelSpan` with <mark>. */
+  function highlight(labelSpan: HTMLElement, query: string): void {
+    const plain = labelSpan.textContent ?? '';
+    labelSpan.textContent = plain;
+    if (!query) return;
+    const idx = plain.toLowerCase().indexOf(query);
+    if (idx === -1) return;
+    const before = plain.slice(0, idx);
+    const match = plain.slice(idx, idx + query.length);
+    const after = plain.slice(idx + query.length);
+    const mark = document.createElement('mark');
+    mark.textContent = match;
+    labelSpan.replaceChildren(document.createTextNode(before), mark, document.createTextNode(after));
+  }
+
+  function initSidebarFilter(): void {
+    const content = document.querySelector<HTMLElement>('.sidebar-pane .sidebar-content');
+    const input = document.getElementById('wd-sb-filter-input') as HTMLInputElement | null;
+    const filterBox = document.getElementById('wd-sb-filter');
+    const clearBtn = document.getElementById('wd-sb-filter-clear');
+    const countEl = document.getElementById('wd-sb-filter-count');
+    if (!content || !input || !filterBox || !clearBtn || !countEl) return;
+
+    const rows = Array.from(content.querySelectorAll<HTMLAnchorElement>('li > a')).map((a) => {
+      const li = a.closest('li') as HTMLLIElement;
+      const ancestors: HTMLLIElement[] = [];
+      for (let el = li.parentElement; el; el = el.parentElement) {
+        if (el instanceof HTMLLIElement) ancestors.push(el);
+      }
+      return {
+        li,
+        label: a.querySelector<HTMLElement>('span') ?? a,
+        text: (a.textContent ?? '').trim().toLowerCase(),
+        ancestors,
+      };
+    });
+
+    const detailsEls = Array.from(content.querySelectorAll<HTMLDetailsElement>('details'));
+    let savedOpenState: boolean[] | null = null;
+
+    function apply(query: string): void {
+      const q = query.trim().toLowerCase();
+      const filtering = q.length > 0;
+      content!.dataset.filtering = String(filtering);
+      filterBox!.classList.toggle('has-value', filtering);
+
+      if (!filtering) {
+        for (const { li, label } of rows) {
+          li.removeAttribute('data-sb-match');
+          highlight(label, '');
+        }
+        for (const li of content!.querySelectorAll<HTMLLIElement>('li[data-sb-ancestor-match]')) {
+          li.removeAttribute('data-sb-ancestor-match');
+        }
+        if (savedOpenState) {
+          detailsEls.forEach((d, i) => {
+            d.open = savedOpenState![i] ?? d.open;
+          });
+          savedOpenState = null;
+        }
+        content!.removeAttribute('data-sb-empty');
+        countEl!.textContent = '';
+        return;
+      }
+
+      if (!savedOpenState) savedOpenState = detailsEls.map((d) => d.open);
+
+      let matchCount = 0;
+      const matchedAncestors = new Set<HTMLLIElement>();
+
+      for (const { li, label, text, ancestors } of rows) {
+        const isMatch = text.includes(q);
+        li.dataset.sbMatch = String(isMatch);
+        highlight(label, isMatch ? q : '');
+        if (isMatch) {
+          matchCount += 1;
+          for (const a of ancestors) matchedAncestors.add(a);
+        }
+      }
+
+      for (const li of content!.querySelectorAll<HTMLLIElement>('li')) {
+        if (matchedAncestors.has(li)) {
+          li.dataset.sbAncestorMatch = 'true';
+          li.dataset.sbMatch = li.dataset.sbMatch ?? 'true';
+        } else if (li.dataset.sbMatch !== 'true') {
+          li.dataset.sbMatch = 'false';
+        }
+      }
+
+      for (const d of detailsEls) {
+        const containsMatch = Array.from(d.querySelectorAll<HTMLLIElement>('li')).some(
+          (li) => li.dataset.sbMatch === 'true',
+        );
+        d.open = containsMatch;
+      }
+
+      content!.dataset.sbEmpty = String(matchCount === 0);
+      countEl!.textContent = matchCount > 0 ? `${matchCount} match${matchCount === 1 ? '' : 'es'}` : '';
+    }
+
+    input.addEventListener('input', () => apply(input.value));
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      apply('');
+      input.focus();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+      e.preventDefault();
+      input.focus();
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && input.value) {
+        e.preventDefault();
+        input.value = '';
+        apply('');
+      }
+    });
+  }
+
+  function initSidebarScrollUX(): void {
+    const pane = document.querySelector<HTMLElement>('#starlight__sidebar');
+    if (!pane) return;
+
+    const syncFades = () => {
+      const overflow = pane.scrollHeight - pane.clientHeight;
+      const more = overflow > 1;
+      pane.toggleAttribute('data-more-above', more && pane.scrollTop > 1);
+      pane.toggleAttribute('data-more-below', more && pane.scrollTop < overflow - 1);
+    };
+    pane.addEventListener('scroll', syncFades, { passive: true });
+    syncFades();
+
+    const active = pane.querySelector<HTMLAnchorElement>('a[aria-current="page"]');
+    if (!active) return;
+    if (!matchMedia('(min-width: 50em)').matches || pane.clientHeight === 0) return;
+
+    for (let el: HTMLElement | null = active.parentElement; el && el !== pane; el = el.parentElement) {
+      if (el instanceof HTMLDetailsElement) el.open = true;
+    }
+
+    const center = () => {
+      const paneBox = pane.getBoundingClientRect();
+      const itemBox = active.getBoundingClientRect();
+      const fullyVisible = itemBox.top >= paneBox.top && itemBox.bottom <= paneBox.bottom;
+      if (fullyVisible) return;
+      pane.scrollTop += itemBox.top - paneBox.top - (paneBox.height - itemBox.height) / 2;
+      syncFades();
+    };
+
+    requestAnimationFrame(center);
+    document.fonts?.ready.then(center);
+  }
+
+  function init(): void {
+    decorateTopLevelSidebarLabels();
+    initSidebarFilter();
+    initSidebarScrollUX();
+  }
+
+  init();
+  document.addEventListener('astro:page-load', init);
 </script>

@@ -2,10 +2,18 @@
 /**
  * Head override.
  *
- * Renders Starlight's normal <head> output, plus one inline <style> that
- * sets `--wd-kicker`, the mono eyebrow above each page title (the manifest's
- * `.doc-number` label). Build-time only — no client JS.
+ * Renders Starlight's normal <head> output, plus:
+ *  1. an inline <style> setting `--wd-kicker`, the mono eyebrow above each
+ *     page title (the manifest's `.doc-number` label);
+ *  2. an inline <script>, run before first paint, that applies the stored
+ *     colour palette (PaletteSelect.astro) the same way Starlight's own
+ *     ThemeProvider applies light/dark — synchronously, so there's no
+ *     flash of the wrong palette on load.
+ * Build-time only for the style block; the palette script is the one
+ * unavoidable pre-paint client script, mirroring Starlight's own pattern.
  */
+import { PALETTES, DEFAULT_PALETTE, PALETTE_STORAGE_KEY, PALETTE_ATTRIBUTE } from '../data/themes';
+
 const { head, entry } = Astro.locals.starlightRoute;
 const id: string = entry.id;
 
@@ -21,9 +29,20 @@ const KICKERS: ReadonlyArray<readonly [prefix: string, label: string]> = [
 const match = KICKERS.find(([prefix]) => id === prefix || id.startsWith(`${prefix}/`));
 const kicker: string = match ? match[1] : 'BF6 Portal SDK';
 
-// Escape for a CSS string literal.
 const css = `:root{--wd-kicker:'${kicker.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'}`;
+
+const paletteIds = JSON.stringify(PALETTES.map((p) => p.id));
 ---
 
 {head.map(({ tag: Tag, attrs, content }) => <Tag {...attrs} set:html={content} />)}
 <style is:inline set:html={css}></style>
+<script is:inline define:vars={{ storageKey: PALETTE_STORAGE_KEY, attr: PALETTE_ATTRIBUTE, ids: paletteIds, fallback: DEFAULT_PALETTE }}>
+  try {
+    var validIds = JSON.parse(ids);
+    var stored = localStorage.getItem(storageKey);
+    var palette = validIds.indexOf(stored) !== -1 ? stored : fallback;
+    document.documentElement.setAttribute(attr, palette);
+  } catch (e) {
+    document.documentElement.setAttribute(attr, fallback);
+  }
+</script>

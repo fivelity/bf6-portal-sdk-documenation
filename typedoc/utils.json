@@ -2,31 +2,13 @@
   "$schema": "https://typedoc.org/schema.json",
   "tsconfig": "./tsconfig.utils.json",
   "entryPoints": [
-    "../node_modules/bf6-portal-utils/benchmarker/index.d.ts",
-    "../node_modules/bf6-portal-utils/callback-handler/index.d.ts",
-    "../node_modules/bf6-portal-utils/clocks/index.d.ts",
-    "../node_modules/bf6-portal-utils/events/index.d.ts",
-    "../node_modules/bf6-portal-utils/ffa-drop-ins/index.d.ts",
-    "../node_modules/bf6-portal-utils/ffa-spawn-points/index.d.ts",
-    "../node_modules/bf6-portal-utils/logger/index.d.ts",
-    "../node_modules/bf6-portal-utils/logging/index.d.ts",
-    "../node_modules/bf6-portal-utils/map-detector/index.d.ts",
-    "../node_modules/bf6-portal-utils/mod-extensions/index.d.ts",
-    "../node_modules/bf6-portal-utils/multi-click-detector/index.d.ts",
-    "../node_modules/bf6-portal-utils/performance-stats/index.d.ts",
-    "../node_modules/bf6-portal-utils/player-undeploy-fixer/index.d.ts",
-    "../node_modules/bf6-portal-utils/portal-gadget/index.d.ts",
-    "../node_modules/bf6-portal-utils/raycast/index.d.ts",
-    "../node_modules/bf6-portal-utils/scavenger-drop/index.d.ts",
-    "../node_modules/bf6-portal-utils/solid-ui/index.d.ts",
-    "../node_modules/bf6-portal-utils/sounds/index.d.ts",
-    "../node_modules/bf6-portal-utils/timers/index.d.ts",
-    "../node_modules/bf6-portal-utils/ui/index.d.ts",
-    "../node_modules/bf6-portal-utils/vectors/index.d.ts"
+    "../node_modules/bf6-portal-utils/*/index.d.ts"
   ],
   "entryPointStrategy": "expand",
   "out": "../src/content/docs/reference/utils",
-  "plugin": ["typedoc-plugin-markdown"],
+  "plugin": [
+    "typedoc-plugin-markdown"
+  ],
   "readme": "none",
   "entryFileName": "index",
   "hidePageHeader": false,
@@ -44,6 +26,9 @@
   "excludePrivate": true,
   "excludeInternal": true,
   "excludeNotDocumented": false,
-  "sort": ["kind", "alphabetical"],
+  "sort": [
+    "kind",
+    "alphabetical"
+  ],
   "gitRevision": "main"
 }

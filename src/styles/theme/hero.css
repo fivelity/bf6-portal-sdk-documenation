@@ -1,8 +1,7 @@
 /* ==========================================================================
-   FRONTLINE HUD THEME — 05 · HERO / SPLASH
-   Deployment-screen hero: mono eyebrow with bracket ticks, huge condensed
-   uppercase title, angular action buttons, corner-bracketed HUD frame
-   instead of the manifest's scanline frame.
+   HERO / SPLASH — palette-agnostic. Corner-bracket HUD frame and scanline
+   frame both live here as two opt-in variants; a palette just leaves
+   --wd-bracket / --wd-scanline transparent to suppress the one it doesn't want.
    ========================================================================== */
 
 [data-has-hero] .hero {
@@ -12,26 +11,26 @@
 }
 
 [data-has-hero] .hero .copy::before {
-  content: var(--wd-hero-eyebrow, '[ BATTLEFIELD 6 · PORTAL SDK REFERENCE ]');
+  content: var(--wd-hero-eyebrow, 'Battlefield 6 Portal · SDK Reference');
   display: flex;
   align-items: center;
   gap: 0.7rem;
   font-family: var(--wd-font-mono);
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--wd-brass);
+  color: var(--wd-accent);
 }
 
 [data-has-hero] .hero h1 {
   font-family: var(--wd-font-display);
-  font-weight: 700;
-  font-size: clamp(3rem, 8vw, 5.75rem);
-  line-height: 0.9;
-  letter-spacing: 0.01em;
+  font-weight: var(--wd-hero-weight);
+  font-size: var(--wd-hero-size);
+  line-height: var(--wd-hero-leading);
+  letter-spacing: 0.008em;
   color: var(--sl-color-white);
-  text-transform: uppercase;
+  text-transform: var(--wd-heading-transform);
 }
 
 [data-has-hero] .hero .tagline {
@@ -41,13 +40,12 @@
   color: var(--wd-paper-dim);
 }
 
-/* Hero actions: angular clipped plates instead of pills */
 [data-has-hero] .hero .sl-link-button {
-  border-radius: 0;
+  border-radius: var(--wd-radius);
   font-family: var(--wd-font-mono);
   font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   padding: 0.8em 1.4em;
   border: 1px solid var(--wd-hairline-strong);
@@ -58,13 +56,13 @@
     color var(--wd-fast) var(--wd-ease);
 }
 [data-has-hero] .hero .sl-link-button.primary {
-  background: var(--wd-brass);
-  border-color: var(--wd-brass);
-  color: #06121a;
+  background: var(--wd-accent);
+  border-color: var(--wd-accent);
+  color: var(--wd-on-accent);
 }
 [data-has-hero] .hero .sl-link-button.primary:hover {
-  background: var(--wd-brass-bright);
-  border-color: var(--wd-brass-bright);
+  background: var(--wd-accent-bright);
+  border-color: var(--wd-accent-bright);
 }
 [data-has-hero] .hero .sl-link-button.secondary,
 [data-has-hero] .hero .sl-link-button.minimal {
@@ -73,22 +71,17 @@
 }
 [data-has-hero] .hero .sl-link-button.secondary:hover,
 [data-has-hero] .hero .sl-link-button.minimal:hover {
-  border-color: var(--wd-brass);
-  color: var(--wd-brass-bright);
+  border-color: var(--wd-accent);
+  color: var(--wd-accent-bright);
 }
 
-/* Landing body h2s keep the HUD section rhythm from base.css automatically
-   (border-left + border-bottom already applied globally) */
-
-/* ---------- Decorative HUD frame (opt-in: <div class="wd-hud">…) ----------
-   Corner brackets (targeting-reticle style) replace the manifest's
-   scanline-only treatment; scanlines are kept as a secondary texture. */
+/* ---------- Decorative HUD frame — <div class="wd-hud"> ---------- */
 .wd-hud {
   position: relative;
   aspect-ratio: 16 / 10;
   overflow: hidden;
   border: var(--wd-rule-strong);
-  background: linear-gradient(160deg, #101c20, #070a0c 72%);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--wd-bg-raised) 70%, var(--wd-accent) 6%), var(--wd-bg-inset) 72%);
 }
 .wd-hud::after {
   content: '';
@@ -97,16 +90,9 @@
   pointer-events: none;
   opacity: 0.35;
   mix-blend-mode: overlay;
-  background: repeating-linear-gradient(
-    0deg,
-    var(--wd-scanline) 0,
-    var(--wd-scanline) 1px,
-    transparent 1px,
-    transparent 3px
-  );
+  background: repeating-linear-gradient(0deg, var(--wd-scanline) 0, var(--wd-scanline) 1px, transparent 1px, transparent 3px);
 }
 .wd-hud::before {
-  /* Four corner brackets, 18px legs, 2px cyan stroke */
   content: '';
   position: absolute;
   inset: 14px;
@@ -122,3 +108,5 @@
     linear-gradient(var(--wd-bracket), var(--wd-bracket)) bottom right / 18px 2px no-repeat;
   opacity: 0.85;
 }
+
+/* Landing-page h2s get the ordinary rhythm from base.css automatically. */

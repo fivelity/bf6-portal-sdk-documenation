@@ -1,0 +1,146 @@
+/* ==========================================================================
+   PALETTE · Frontline HUD   (id: hud — the default)
+   BC2/BF3-era digital HUD: matte gunmetal canvas, cyan readout accent,
+   amber caution, angular corner cuts.
+
+   A palette is VALUES ONLY. Component CSS reads these tokens and never
+   hard-codes a colour, so adding a palette means copying this file and
+   editing the values — no component CSS changes.
+
+   Selector shape (keep it when copying — it is what makes palette × mode work):
+     structure   :root[data-palette='<id>']
+     dark mode   :root[data-palette='<id>']:not([data-theme='light'])
+     light mode  :root[data-palette='<id>'][data-theme='light']
+   The default palette also matches when data-palette is absent (no-JS / first paint).
+   ========================================================================== */
+
+/* ---------- Structure: type, shape, headings (mode independent) ---------- */
+:root:is(:not([data-palette]), [data-palette='hud']) {
+  --wd-font-display: 'Oswald Variable', 'Oswald', 'Arial Narrow', Impact, sans-serif;
+
+  --wd-radius: 0px;
+  --wd-clip-sm: polygon(0 0, 100% 0, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  --wd-clip-md: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  --wd-clip-notch: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+
+  --wd-heading-transform: uppercase;
+  --wd-heading-weight: 600;
+  --wd-heading-weight-sub: 600;
+  --wd-heading-tracking: 0.015em;
+  --wd-h1-size: clamp(2.1rem, 4.4vw, 3.1rem);
+  --wd-h1-leading: 0.98;
+  --wd-h2-size: clamp(1.6rem, 2.6vw, 2.15rem);
+  --wd-h2-leading: 1.05;
+  --wd-h3-size: 1.28rem;
+  --wd-h4-size: 1.02rem;
+  --wd-h2-rail: 3px;
+  --wd-h2-pad: 0.7rem;
+  --wd-title-size: 1.35rem;
+  --wd-title-weight: 700;
+
+  --wd-hero-size: clamp(3rem, 8vw, 5.75rem);
+  --wd-hero-weight: 700;
+  --wd-hero-leading: 0.9;
+  --wd-hero-eyebrow: '[ BATTLEFIELD 6 · PORTAL SDK REFERENCE ]';
+
+  --wd-card-title-size: 1.25rem;
+  --wd-card-title-weight: 700;
+  --wd-thead-rule: 2px solid var(--wd-accent);
+  --wd-th-color: var(--wd-accent);
+  --wd-inline-code-border: 1px solid color-mix(in srgb, var(--wd-accent) 25%, transparent);
+  --wd-focus-halo: 0 0 0 5px color-mix(in srgb, var(--wd-accent) 20%, transparent);
+  --wd-tick-opacity: 0.6;
+  --wd-ref-def-prefix: '// ';
+  --wd-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --wd-fast: 0.12s;
+}
+
+/* ---------- Dark ---------- */
+:root:is(:not([data-palette]), [data-palette='hud']):not([data-theme='light']) {
+  --wd-bg: #0a0d0f;
+  --wd-bg-raised: #10151a;
+  --wd-bg-inset: #070a0c;
+  --wd-paper: #d9e6ea;
+  --wd-paper-dim: #86a0aa;
+  --wd-muted: #7c95a0; /* was #4d6169 — 3.0:1. Now 6.3:1 on the sidebar. */
+  --wd-hairline: #1c2a30;
+  --wd-hairline-strong: #2c414a;
+  --wd-gray-3: #8ba3ad;
+  --wd-gray-7: #10151a;
+
+  --wd-accent: #35d0e0;
+  --wd-accent-bright: #7cf2ff;
+  --wd-accent-deep: #0e2e33;
+  --wd-on-accent: #06121a;
+
+  --wd-info: #3fa9f5;
+  --wd-ok: #5ad46a;
+  --wd-warn: #ff9c2e;
+  --wd-danger: #ff4a3d;
+  --wd-info-low: #0f2438;   --wd-info-high: #a9d4f5;
+  --wd-ok-low: #12281a;     --wd-ok-high: #a8ecb2;
+  --wd-warn-low: #2e1f0a;   --wd-warn-high: #ffd199;
+  --wd-danger-low: #331410; --wd-danger-high: #ffb3ab;
+
+  --wd-plate: var(--wd-bg-inset);
+  --wd-plate-hover: var(--wd-bg-raised);
+  --wd-code-bg: #060809;
+  --wd-inline-code-bg: rgba(53, 208, 224, 0.08);
+  --wd-scanline: rgba(53, 208, 224, 0.05);
+  --wd-grid-line: rgba(53, 208, 224, 0.035);
+  --wd-bracket: var(--wd-accent);
+  --wd-glow-a: rgba(53, 208, 224, 0.05);
+  --wd-glow-b: rgba(255, 156, 46, 0.035);
+  --wd-backdrop: rgba(4, 6, 7, 0.82);
+  --wd-shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--wd-hairline-strong);
+  --wd-rail-1: var(--wd-accent);
+  --wd-rail-2: var(--wd-info);
+  --wd-rail-3: var(--wd-ok);
+  --wd-rail-4: var(--wd-warn);
+  --wd-theme-color: #070a0c;
+}
+
+/* ---------- Light: overcast-daylight HUD ---------- */
+:root:is(:not([data-palette]), [data-palette='hud'])[data-theme='light'] {
+  --wd-bg: #eef2f3;
+  --wd-bg-raised: #ffffff;
+  --wd-bg-inset: #f6f9fa;
+  --wd-paper: #162225;
+  --wd-paper-dim: #33474d;
+  --wd-muted: #52676d; /* was #758d93 — 3.3:1. Now 5.6:1. */
+  --wd-hairline: #d3e0e2;
+  --wd-hairline-strong: #c3d2d5;
+  --wd-gray-3: #4f666c;
+  --wd-gray-7: #e9f1f2;
+
+  --wd-accent: #0a7d8c;
+  --wd-accent-bright: #06525c;
+  --wd-accent-deep: #d3eef1;
+  --wd-on-accent: #ffffff;
+
+  --wd-info: #1f6fb8;
+  --wd-ok: #1f8f42;
+  --wd-warn: #c97418;
+  --wd-danger: #c8402f;
+  --wd-info-low: #dceaf7;   --wd-info-high: #143f6b;
+  --wd-ok-low: #dcf1e2;     --wd-ok-high: #14512a;
+  --wd-warn-low: #f7e6cf;   --wd-warn-high: #6b3d0b;
+  --wd-danger-low: #f7dcd7; --wd-danger-high: #6b1f16;
+
+  --wd-plate: var(--wd-bg-inset);
+  --wd-plate-hover: #ffffff;
+  --wd-code-bg: #f6f9fa;
+  --wd-inline-code-bg: rgba(10, 125, 140, 0.08);
+  --wd-scanline: rgba(10, 125, 140, 0.04);
+  --wd-grid-line: rgba(10, 125, 140, 0.03);
+  --wd-bracket: #0a7d8c;
+  --wd-glow-a: rgba(10, 125, 140, 0.05);
+  --wd-glow-b: rgba(201, 116, 24, 0.04);
+  --wd-backdrop: rgba(22, 34, 37, 0.5);
+  --wd-shadow-lg: 0 20px 48px rgba(16, 24, 27, 0.14), 0 0 0 1px var(--wd-hairline-strong);
+  --wd-rail-1: var(--wd-accent);
+  --wd-rail-2: var(--wd-info);
+  --wd-rail-3: var(--wd-ok);
+  --wd-rail-4: var(--wd-warn);
+  --wd-theme-color: #f6f9fa;
+}

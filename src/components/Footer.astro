@@ -2,16 +2,25 @@
 /**
  * Footer override.
  *
- * Wraps Starlight's default Footer unmodified, and appends a disclaimer
- * callout communicating that this site is community-derived from the
- * bf6-portal-mod-types / bf6-portal-utils npm packages, not an official
- * EA/DICE resource. Styled in src/styles/theme/chrome.css under
- * "Footer disclaimer callout".
+ * Wraps Starlight's default Footer unmodified, then appends:
+ *   1. an SDK-version line ("SDK 1.4.3.0 · mod-types 4.3.0 · utils 9.4.0"),
+ *      read from sdk-info.ts (never hand-typed);
+ *   2. the existing disclaimer callout, unchanged in substance.
  */
 import Default from '@astrojs/starlight/components/Footer.astro';
+import { sdkStats, formatCount } from '../data/sdk-info';
 ---
 
 <Default {...Astro.props}><slot /></Default>
+<div class="wd-footer-sdk">
+  <p>
+    Documenting <strong>Official BF6 Portal SDK {sdkStats.sdkVersion}</strong>
+    &nbsp;·&nbsp; <code>bf6-portal-mod-types@{sdkStats.modTypesVersion}</code>
+    &nbsp;·&nbsp; <code>bf6-portal-utils@{sdkStats.utilsVersion}</code>
+    &nbsp;·&nbsp; {formatCount(sdkStats.functions)} functions, {formatCount(sdkStats.enums)} enums,{' '}
+    {formatCount(sdkStats.typeAliases)} type aliases, {sdkStats.utilsModules} utils modules
+  </p>
+</div>
 <div class="wd-footer-disclaimer">
   <p>
     These docs are generated from the community npm packages

@@ -1,94 +1,47 @@
 #!/usr/bin/env node
 /**
- * Counts the real symbol totals in the installed `bf6-portal-mod-types`
- * package and writes them to `src/data/sdk-stats.json`. Conceptual guide
- * pages (`overview.md`, `events-and-enums.md`) and the sidebar badge read
- * from that file instead of hardcoding numbers that silently rot on every
- * SDK version bump.
+ * Writes `src/data/sdk-stats.json` — the ONLY place site-wide SDK numbers
+ * and versions come from. Read by src/data/sdk-info.ts (typed), which feeds
+ * the header badges, footer, overview pages and the home-page stat strip.
  *
- * Counts, by source file:
- *   - functions        : `export function` lines in index.d.ts
- *   - enums            : `export enum` lines in enums.d.ts, PLUS one count
- *                         per `export enum` in each runtime-spawn-enums/*.d.ts
- *                         (one `RuntimeSpawn_<Map>` enum per official map)
- *   - typeAliases      : `export type` lines in types.d.ts
- *   - eventHandlerSigs : `export function` / `function` lines in
- *                         event-handler-signatures.d.ts
+ * Runs as the LAST step of `docs:api`, after TypeDoc, so the file also
+ * records what was actually generated. Run `docs:verify` (or CI) to fail if
+ * the source-declaration counts and the generated pages disagree.
  *
- * These are line-pattern counts against the package's own ambient
- * declaration style (one declaration per line, `export function Name(` /
- * `export enum Name {` / `export type Name =`), not a full TS AST parse —
- * matching how the package has been authored across versions. If a future
- * SDK release reformats declarations (e.g. multi-line signatures before the
- * opening paren), re-check this script's regexes against the new file
- * rather than trusting stale counts.
- *
- * Run via `pnpm run docs:stats`, and automatically as the first step of
- * `pnpm run docs:api` (see package.json) so the numbers are always fresh
- * before a build.
+ * Nothing in here is hand-maintained: bump the SDK packages, re-run
+ * `pnpm run docs:api`, and every number on the site follows.
  */
-import { readFile, readdir, writeFile, mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { writeFile, mkdir } from 'node:fs/promises';
+import { readSourceSymbols, countReferencePages } from './lib/sdk-source.mjs';
 
-const PKG_ROOT = 'node_modules/bf6-portal-mod-types';
 const OUT_PATH = 'src/data/sdk-stats.json';
 
-function countMatches(text, regex) {
-  return (text.match(regex) ?? []).length;
-}
-
 async function run() {
-  let indexDts;
-  let enumsDts;
-  let typesDts;
-  let ehsDts;
-  let pkgJson;
+  let source;
   try {
-    [indexDts, enumsDts, typesDts, ehsDts, pkgJson] = await Promise.all([
-      readFile(join(PKG_ROOT, 'index.d.ts'), 'utf8'),
-      readFile(join(PKG_ROOT, 'enums.d.ts'), 'utf8'),
-      readFile(join(PKG_ROOT, 'types.d.ts'), 'utf8'),
-      readFile(join(PKG_ROOT, 'event-handler-signatures.d.ts'), 'utf8'),
-      readFile(join(PKG_ROOT, 'package.json'), 'utf8'),
-    ]);
+    source = await readSourceSymbols();
   } catch (err) {
-    console.error(
-      '[docs:stats] Could not read bf6-portal-mod-types from node_modules — run `pnpm install` first.',
-    );
-    console.error(err.message);
+    console.error('[docs:stats] Could not read the SDK packages from node_modules — run `pnpm install` first.');
+    console.error(err instanceof Error ? err.message : err);
     process.exitCode = 1;
     return;
   }
-
-  const functions = countMatches(indexDts, /^\s*export function \w+/gm);
-  const namedEnums = countMatches(enumsDts, /^\s*export enum \w+/gm);
-  const typeAliases = countMatches(typesDts, /^\s*export type \w+/gm);
-  const eventHandlerSignatures = countMatches(ehsDts, /^\s*(export )?function \w+/gm);
-
-  let runtimeSpawnEnums = 0;
-  let runtimeSpawnMapCount = 0;
-  const rsDir = join(PKG_ROOT, 'runtime-spawn-enums');
-  try {
-    const files = (await readdir(rsDir)).filter((f) => f.endsWith('.d.ts'));
-    runtimeSpawnMapCount = files.length;
-    for (const file of files) {
-      const content = await readFile(join(rsDir, file), 'utf8');
-      runtimeSpawnEnums += countMatches(content, /^\s*export enum \w+/gm);
-    }
-  } catch {
-    // No runtime-spawn-enums directory in this version — leave at 0.
-  }
-
-  const enums = namedEnums + runtimeSpawnEnums;
-  const version = JSON.parse(pkgJson).version ?? 'unknown';
+  const generated = await countReferencePages();
 
   const stats = {
-    modTypesVersion: version,
-    functions,
-    enums,
-    enumsBreakdown: { named: namedEnums, perMapRuntimeSpawn: runtimeSpawnEnums, mapCount: runtimeSpawnMapCount },
-    typeAliases,
-    eventHandlerSignatures,
+    sdkVersion: source.sdkVersion,
+    sdkVersionSource: source.sdkVersionSource,
+    modTypesVersion: source.modTypesVersion,
+    utilsVersion: source.utilsVersion,
+    functions: source.functions,
+    functionOverloads: source.functionOverloads,
+    enums: source.enums,
+    enumsBreakdown: source.enumsBreakdown,
+    typeAliases: source.typeAliases,
+    eventHandlerSignatures: source.eventHandlerSignatures,
+    utilsModules: source.utilsModules,
+    utilsModuleNames: source.utilsModuleNames,
+    generatedPages: generated,
     generatedAt: new Date().toISOString(),
   };
 
@@ -96,9 +49,11 @@ async function run() {
   await writeFile(OUT_PATH, JSON.stringify(stats, null, 2) + '\n', 'utf8');
 
   console.log(
-    `[docs:stats] bf6-portal-mod-types@${version}: ${functions} functions, ${enums} enums ` +
-      `(${namedEnums} named + ${runtimeSpawnEnums} per-map across ${runtimeSpawnMapCount} maps), ` +
-      `${typeAliases} type aliases, ${eventHandlerSignatures} event handler signatures.`,
+    `[docs:stats] SDK ${stats.sdkVersion} (${stats.sdkVersionSource}) · mod-types@${stats.modTypesVersion} · utils@${stats.utilsVersion}`,
+  );
+  console.log(
+    `[docs:stats] ${stats.functions} functions (${stats.functionOverloads} overload declarations), ${stats.enums} enums, ` +
+      `${stats.typeAliases} type aliases, ${stats.eventHandlerSignatures} handler signatures, ${stats.utilsModules} utils modules.`,
   );
   console.log(`[docs:stats] Wrote ${OUT_PATH}`);
 }

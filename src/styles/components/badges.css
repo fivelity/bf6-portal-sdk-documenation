@@ -1,0 +1,77 @@
+/* ==========================================================================
+   BADGES — header build/version chips.
+   Deliberately NOT the "service ribbon" look (woven fabric bar, gold bezel):
+   that read as bulky/decorative next to a technical reference site. This is
+   a flat, single-row chip: a small dot/icon, a muted label, a value in mono.
+   Palette-agnostic; renders correctly under both palette + both modes,
+   which the old ribbon version did not (its colours were hard-coded and
+   never touched --wd-* tokens, so it went invisible on the HUD palette).
+   ========================================================================== */
+
+.wd-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.wd-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.wd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  height: 1.9rem;
+  padding: 0 0.6em;
+  border: var(--wd-rule-strong);
+  border-radius: var(--wd-radius);
+  background: var(--wd-plate);
+  font-family: var(--wd-font-mono);
+  font-size: 0.72rem;
+  line-height: 1;
+  color: var(--wd-paper-dim);
+  white-space: nowrap;
+  clip-path: var(--wd-clip-sm);
+  transition: border-color var(--wd-fast) var(--wd-ease), background var(--wd-fast) var(--wd-ease);
+}
+.wd-chip:hover {
+  border-color: var(--wd-accent);
+  background: var(--wd-plate-hover);
+}
+.wd-chip__icon {
+  flex-shrink: 0;
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--wd-accent);
+}
+.wd-chip__label {
+  color: var(--wd-muted);
+  letter-spacing: 0.02em;
+}
+.wd-chip__value {
+  color: var(--sl-color-white);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.wd-chip__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--wd-ok);
+  flex-shrink: 0;
+}
+
+/* Progressive shrink so the centred search box always has room */
+@media (max-width: 78rem) {
+  .wd-chip__label {
+    display: none;
+  }
+}
+@media (max-width: 60rem) {
+  .wd-badge-row {
+    display: none;
+  }
+}

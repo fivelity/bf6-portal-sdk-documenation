@@ -1,0 +1,6 @@
+---
+import Chip from './Chip.astro';
+import { buildInfo } from '../../data/build-info';
+---
+
+<Chip icon="clock" label="Elapsed" value={buildInfo.elapsedLabel} title={buildInfo.elapsedTitle} />

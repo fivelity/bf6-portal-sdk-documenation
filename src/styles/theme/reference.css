@@ -1,9 +1,7 @@
 /* ==========================================================================
-   FRONTLINE HUD THEME — 06 · API REFERENCE
-   Structurally identical to wardogs reference.css (same selectors, same
-   [data-section='reference'] hook from MarkdownContent.astro) — only the
-   heading treatment shifts to mono/uppercase HUD-label style and the
-   "Defined in" line reads like a HUD coordinate readout.
+   API REFERENCE — typedoc-plugin-markdown output: dense parameter tables,
+   long signatures, deep heading trees. Tagged by MarkdownContent.astro via
+   [data-section='reference']. Palette-agnostic.
    ========================================================================== */
 
 [data-section='reference'] {
@@ -18,16 +16,16 @@
   letter-spacing: 0;
   line-height: 1.25;
   word-break: break-word;
-  text-transform: none; /* symbol names stay as-cased — don't uppercase API identifiers */
+  text-transform: none; /* symbol names stay as-cased */
 }
 [data-section='reference'] h2 {
   font-size: 1.28rem;
-  border-left: 3px solid var(--wd-brass);
+  border-left: 3px solid var(--wd-accent);
   padding-left: 0.6rem;
 }
 [data-section='reference'] h3 {
   font-size: 1.05rem;
-  color: var(--wd-brass-bright);
+  color: var(--wd-accent-bright);
 }
 [data-section='reference'] h4 {
   font-size: 0.9rem;
@@ -38,12 +36,13 @@
 
 [data-section='reference'] table {
   font-size: 0.84rem;
+  max-width: 100%;
 }
 [data-section='reference'] td:first-child code,
 [data-section='reference'] td:first-child {
   font-family: var(--wd-font-mono);
   font-size: 0.82rem;
-  color: var(--wd-brass-bright);
+  color: var(--wd-accent-bright);
 }
 [data-section='reference'] td {
   padding-block: 0.55rem;
@@ -53,22 +52,18 @@
   margin-block: 0.75rem;
 }
 
-/* "Defined in" / "Returns" lines: HUD coordinate-readout styling */
+/* "Defined in" / "Returns" lines */
 [data-section='reference'] p > em:only-child {
   font-family: var(--wd-font-mono);
   font-size: 0.72rem;
   color: var(--wd-muted);
 }
 [data-section='reference'] p > em:only-child::before {
-  content: '// ';
+  content: var(--wd-ref-def-prefix);
   color: var(--wd-hairline-strong);
 }
 
 [data-section='reference'] blockquote {
   font-size: 0.86rem;
   border-inline-start-color: var(--wd-hairline-strong);
-}
-
-[data-section='reference'] table {
-  max-width: 100%;
 }

@@ -1,0 +1,59 @@
+---
+/**
+ * PaletteSelect — a second, independent "theme" axis: which colour palette
+ * (Frontline HUD / Wardogs Manifest) is active, orthogonal to Starlight's
+ * own light/dark/auto mode. Reuses Starlight's <Select> so it matches the
+ * built-in theme picker pixel-for-pixel rather than inventing new chrome.
+ *
+ * Persisted to localStorage under PALETTE_STORAGE_KEY (src/data/themes.ts)
+ * and applied via a `data-palette` attribute on <html>, read by every
+ * palette file in src/styles/theme/palettes/*.css.
+ */
+import Select from '@astrojs/starlight/components/Select.astro';
+import { PALETTES, DEFAULT_PALETTE, PALETTE_STORAGE_KEY, PALETTE_ATTRIBUTE } from '../data/themes';
+---
+
+<starlight-palette-select class="wd-palette-select">
+  <Select
+    icon="seti:plan"
+    label="Select colour palette"
+    width="8em"
+    options={PALETTES.map((p) => ({ label: p.label, value: p.id, selected: p.id === DEFAULT_PALETTE }))}
+  />
+</starlight-palette-select>
+
+<script define:vars={{ storageKey: PALETTE_STORAGE_KEY, attr: PALETTE_ATTRIBUTE, ids: PALETTES.map((p) => p.id) }}>
+  function isValid(v) {
+    return typeof v === 'string' && ids.includes(v);
+  }
+  function load() {
+    const stored = typeof localStorage !== 'undefined' ? localStorage.getItem(storageKey) : null;
+    return isValid(stored) ? stored : ids[0];
+  }
+  function store(id) {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(storageKey, id);
+  }
+  function apply(id) {
+    document.documentElement.setAttribute(attr, id);
+    for (const sel of document.querySelectorAll('starlight-palette-select select')) {
+      if (sel instanceof HTMLSelectElement) sel.value = id;
+    }
+  }
+
+  // Applied inline in Head.astro before first paint to avoid a flash; this
+  // just keeps the <select> UI in sync and reacts to future changes.
+  apply(load());
+
+  class StarlightPaletteSelect extends HTMLElement {
+    constructor() {
+      super();
+      this.querySelector('select')?.addEventListener('change', (e) => {
+        if (e.currentTarget instanceof HTMLSelectElement && isValid(e.currentTarget.value)) {
+          store(e.currentTarget.value);
+          apply(e.currentTarget.value);
+        }
+      });
+    }
+  }
+  customElements.define('starlight-palette-select', StarlightPaletteSelect);
+</script>

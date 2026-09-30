@@ -1,0 +1,6 @@
+---
+import Chip from './Chip.astro';
+import { buildInfo } from '../../data/build-info';
+---
+
+<Chip icon="tool" label="Built with" value={buildInfo.tool} title={`Built with ${buildInfo.tool}`} />

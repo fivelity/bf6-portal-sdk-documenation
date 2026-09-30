@@ -64,7 +64,7 @@ export default defineConfig({
         '@fontsource-variable/big-shoulders-display',
         '@fontsource-variable/inter',
         '@fontsource-variable/jetbrains-mono',
-        './src/styles/frontline-hud-theme.css',
+        './src/styles/theme.css',
       ],
 
       components: {
@@ -100,7 +100,6 @@ export default defineConfig({
             { label: 'Installation & Setup', slug: 'guides/installation' },
             { label: 'Architecture & Core Concepts', slug: 'guides/architecture' },
             { label: 'Quickstart Guide', slug: 'guides/quickstart' },
-            { label: 'About', slug: 'about' },
           ],
         },
         {

@@ -1,7 +1,9 @@
 /* ==========================================================================
-   FRONTLINE HUD THEME — 02 · BASE
-   Same contract as wardogs base.css: unlayered so it beats Starlight's
-   @layer starlight.* without !important anywhere.
+   BASE — typography, canvas, focus, selection, scrollbars, reduced motion.
+   Palette-agnostic: reads --wd-* tokens only, so it renders identically
+   under any palette in src/styles/theme/palettes/*.css.
+   Unlayered on purpose: Starlight ships everything inside @layer
+   starlight.*, and unlayered CSS always wins without !important anywhere.
    ========================================================================== */
 
 html {
@@ -19,9 +21,8 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Canvas texture: faint HUD grid + two status-colour glows (cyan/amber)
-   instead of the manifest's soft brass/blue radial pair. Grid uses a
-   repeating linear-gradient pair so it reads as graph paper, not noise. */
+/* Canvas texture: two soft glows, optionally over a faint grid (HUD-style
+   palettes set --wd-grid-line; plate-style palettes leave it transparent). */
 body::before {
   content: '';
   position: fixed;
@@ -29,28 +30,25 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 18% 10%, var(--wd-canvas-glow-a), transparent 42%),
-    radial-gradient(circle at 90% 85%, var(--wd-canvas-glow-b), transparent 42%),
+    radial-gradient(circle at 18% 10%, var(--wd-glow-a), transparent 42%),
+    radial-gradient(circle at 90% 85%, var(--wd-glow-b), transparent 42%),
     repeating-linear-gradient(0deg, var(--wd-grid-line) 0, var(--wd-grid-line) 1px, transparent 1px, transparent 64px),
     repeating-linear-gradient(90deg, var(--wd-grid-line) 0, var(--wd-grid-line) 1px, transparent 1px, transparent 64px);
 }
 
 ::selection {
-  background: var(--wd-brass);
-  color: #06121a;
+  background: var(--wd-accent);
+  color: var(--wd-on-accent);
 }
 
-/* Focus: cyan, angular, double-ring — closer to a targeting reticle than
-   the manifest's single offset outline */
 :focus-visible {
-  outline: 2px solid var(--wd-brass);
+  outline: 2px solid var(--wd-accent);
   outline-offset: 3px;
-  border-radius: 0;
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--wd-brass) 20%, transparent);
+  border-radius: var(--wd-radius);
+  box-shadow: var(--wd-focus-halo);
 }
 
-/* ---------- Headings: Oswald condensed, uppercase, tight — HUD label
-   style rather than the manifest's big display type ---------- */
+/* ---------- Headings ---------- */
 .sl-markdown-content h1,
 .sl-markdown-content h2,
 .sl-markdown-content h3,
@@ -59,46 +57,45 @@ body::before {
 .sl-markdown-content h6,
 h1#_top {
   font-family: var(--wd-font-display);
-  font-weight: 600;
-  letter-spacing: 0.015em;
+  font-weight: var(--wd-heading-weight);
+  letter-spacing: var(--wd-heading-tracking);
   color: var(--sl-color-white);
-  text-transform: uppercase;
+  text-transform: var(--wd-heading-transform);
 }
 
 .sl-markdown-content h2 {
-  font-size: clamp(1.6rem, 2.6vw, 2.15rem);
-  line-height: 1.05;
+  font-size: var(--wd-h2-size);
+  line-height: var(--wd-h2-leading);
   padding-bottom: 0.5rem;
-  padding-left: 0.7rem;
+  padding-left: var(--wd-h2-pad);
   border-bottom: var(--wd-rule);
-  border-left: 3px solid var(--wd-brass);
+  border-left: var(--wd-h2-rail) solid var(--wd-accent);
 }
 .sl-markdown-content h3 {
-  font-size: 1.28rem;
-  font-weight: 600;
-  line-height: 1.1;
+  font-size: var(--wd-h3-size);
+  font-weight: var(--wd-heading-weight-sub);
+  line-height: 1.05;
   letter-spacing: 0.01em;
 }
 .sl-markdown-content h4 {
-  font-size: 1.02rem;
-  font-weight: 600;
+  font-size: var(--wd-h4-size);
+  font-weight: var(--wd-heading-weight-sub);
   letter-spacing: 0.01em;
 }
 .sl-markdown-content h5,
 .sl-markdown-content h6 {
   font-family: var(--wd-font-mono);
-  font-size: 0.7rem;
+  font-size: 0.71rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
   color: var(--wd-muted);
 }
 
-/* Page title — HUD readout label ("SECTOR // Guide Name") via the same
-   --wd-kicker var Head.astro already sets; no component change needed */
+/* Page title — kicker eyebrow set by Head.astro via --wd-kicker */
 h1#_top {
-  font-size: clamp(2.1rem, 4.4vw, 3.1rem);
-  line-height: 0.98;
+  font-size: var(--wd-h1-size);
+  line-height: var(--wd-h1-leading);
   margin-top: 0.4rem;
 }
 h1#_top::before {
@@ -110,13 +107,9 @@ h1#_top::before {
   font-family: var(--wd-font-mono);
   font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--sl-color-accent);
-}
-h1#_top::after {
-  /* HUD corner tick under the kicker line, purely decorative */
-  content: '';
 }
 [data-has-hero] h1#_top::before {
   content: none;
@@ -126,7 +119,7 @@ h1#_top::after {
   color: var(--wd-muted);
 }
 .sl-anchor-link:hover {
-  color: var(--wd-brass-bright);
+  color: var(--wd-accent-bright);
 }
 
 /* ---------- Body copy ---------- */
@@ -143,7 +136,7 @@ h1#_top::after {
 }
 .sl-markdown-content a:not(.not-content a):not(.sl-anchor-link) {
   color: var(--sl-color-text-accent);
-  text-decoration-color: color-mix(in srgb, var(--wd-brass) 50%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--wd-accent) 48%, transparent);
   text-underline-offset: 0.2em;
   transition: text-decoration-color var(--wd-fast) var(--wd-ease);
 }
@@ -157,31 +150,30 @@ h1#_top::after {
   margin-block: 2.5rem;
 }
 
-/* Blockquote: HUD callout — cyan rail, angular corner cut */
 .sl-markdown-content blockquote {
   margin-inline: 0;
   padding: 0.9rem 1.2rem;
-  border-inline-start: 3px solid var(--wd-brass);
+  border-inline-start: 3px solid var(--wd-accent);
   background: var(--wd-plate);
   color: var(--sl-color-text);
-  clip-path: var(--wd-clip-notch-tr);
+  clip-path: var(--wd-clip-notch);
 }
 
 /* ---------- Inline code ---------- */
 .sl-markdown-content :not(pre) > code {
   font-family: var(--wd-font-mono);
   font-size: 0.86em;
-  color: var(--wd-brass-bright);
+  color: var(--wd-accent-bright);
   background: var(--sl-color-bg-inline-code);
   padding: 1.5px 5px;
-  border-radius: 0;
-  border: 1px solid color-mix(in srgb, var(--wd-brass) 25%, transparent);
+  border-radius: var(--wd-radius);
+  border: var(--wd-inline-code-border);
 }
 .sl-markdown-content h1 code,
 .sl-markdown-content h2 code,
 .sl-markdown-content h3 code,
 .sl-markdown-content h4 code {
-  font-size: 0.78em;
+  font-size: 0.79em;
   letter-spacing: 0;
   text-transform: none;
 }
@@ -192,18 +184,16 @@ kbd {
   padding: 1px 6px;
   border: var(--wd-rule-strong);
   border-bottom-width: 2px;
-  border-radius: 0;
+  border-radius: var(--wd-radius);
   background: var(--wd-plate);
   color: var(--sl-color-white);
 }
 
-/* ---------- Scrollbars ---------- */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--wd-hairline-strong) transparent;
 }
 
-/* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -211,8 +201,8 @@ kbd {
   *,
   *::before,
   *::after {
-    animation-duration: 0.001ms;
-    animation-iteration-count: 1;
-    transition-duration: 0.001ms;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
 }

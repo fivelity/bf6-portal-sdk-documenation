@@ -1,0 +1,138 @@
+/* ==========================================================================
+   PALETTE · Wardogs Manifest   (id: manifest)
+   Warm paper text on a near-black canvas, brass accent, faction colours,
+   square plates with no corner cuts. Ported from the original
+   wardogs-operations-manifest theme onto the shared token contract.
+   See hud.css for the selector convention.
+   ========================================================================== */
+
+/* ---------- Structure ---------- */
+:root[data-palette='manifest'] {
+  --wd-font-display: 'Big Shoulders Display Variable', 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
+
+  --wd-radius: 2px;
+  --wd-clip-sm: none;
+  --wd-clip-md: none;
+  --wd-clip-notch: none;
+
+  --wd-heading-transform: none;
+  --wd-heading-weight: 800;
+  --wd-heading-weight-sub: 700;
+  --wd-heading-tracking: 0.01em;
+  --wd-h1-size: clamp(2.4rem, 5vw, 3.6rem);
+  --wd-h1-leading: 0.94;
+  --wd-h2-size: clamp(1.9rem, 3.2vw, 2.6rem);
+  --wd-h2-leading: 0.98;
+  --wd-h3-size: 1.55rem;
+  --wd-h4-size: 1.2rem;
+  --wd-h2-rail: 0px;
+  --wd-h2-pad: 0px;
+  --wd-title-size: 1.45rem;
+  --wd-title-weight: 800;
+
+  --wd-hero-size: clamp(3.4rem, 9vw, 6.75rem);
+  --wd-hero-weight: 800;
+  --wd-hero-leading: 0.86;
+  --wd-hero-eyebrow: 'Battlefield 6 Portal · SDK Reference';
+
+  --wd-card-title-size: 1.4rem;
+  --wd-card-title-weight: 800;
+  --wd-thead-rule: 1px solid var(--wd-hairline-strong);
+  --wd-th-color: var(--wd-muted);
+  --wd-inline-code-border: 0;
+  --wd-focus-halo: 0 0 0 0 transparent;
+  --wd-tick-opacity: 0;
+  --wd-ref-def-prefix: '';
+  --wd-easing: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --wd-fast: 0.15s;
+}
+
+/* ---------- Dark ---------- */
+:root[data-palette='manifest']:not([data-theme='light']) {
+  --wd-bg: #100f0c;
+  --wd-bg-raised: #17150f;
+  --wd-bg-inset: #0b0a08;
+  --wd-paper: #e8e3d5;
+  --wd-paper-dim: #a8a08c;
+  --wd-muted: #908974; /* was #726b5b — 3.7:1. Now 5.7:1. */
+  --wd-hairline: #332f26;
+  --wd-hairline-strong: #4a4433;
+  --wd-gray-3: #a19a86;
+  --wd-gray-7: #17150f;
+
+  --wd-accent: #c9a227;
+  --wd-accent-bright: #e0b940;
+  --wd-accent-deep: #3a3015;
+  --wd-on-accent: #100f0c;
+
+  --wd-info: #4f8ce8;    /* Lonestar  */
+  --wd-ok: #3fbf5e;      /* Manticore */
+  --wd-warn: #c9a227;    /* brass     */
+  --wd-danger: #e8543f;  /* Valkyra   */
+  --wd-info-low: #142033;   --wd-info-high: #a9c8f5;
+  --wd-ok-low: #14261a;     --wd-ok-high: #a6e3b5;
+  --wd-warn-low: #2b2410;   --wd-warn-high: #f0d47a;
+  --wd-danger-low: #33150f; --wd-danger-high: #f4a99d;
+
+  --wd-plate: var(--wd-bg-inset);
+  --wd-plate-hover: var(--wd-bg-raised);
+  --wd-code-bg: #0d0c09;
+  --wd-inline-code-bg: rgba(255, 255, 255, 0.06);
+  --wd-scanline: rgba(0, 0, 0, 0.12);
+  --wd-grid-line: transparent;
+  --wd-bracket: transparent;
+  --wd-glow-a: rgba(201, 162, 39, 0.045);
+  --wd-glow-b: rgba(79, 140, 232, 0.04);
+  --wd-backdrop: rgba(11, 10, 8, 0.78);
+  --wd-shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--wd-hairline-strong);
+  --wd-rail-1: var(--wd-info);
+  --wd-rail-2: var(--wd-ok);
+  --wd-rail-3: var(--wd-danger);
+  --wd-rail-4: var(--wd-accent);
+  --wd-theme-color: #0b0a08;
+}
+
+/* ---------- Light: paper-forward inversion ---------- */
+:root[data-palette='manifest'][data-theme='light'] {
+  --wd-bg: #f4f1e8;
+  --wd-bg-raised: #ffffff;
+  --wd-bg-inset: #fbf9f2;
+  --wd-paper: #1c1a15;
+  --wd-paper-dim: #3c382d;
+  --wd-muted: #635d47; /* was #857f6c — 3.8:1. Now 6.3:1. */
+  --wd-hairline: #ddd6c1;
+  --wd-hairline-strong: #cfc9b6;
+  --wd-gray-3: #5b5748;
+  --wd-gray-7: #efebde;
+
+  --wd-accent: #b08d1c;
+  --wd-accent-bright: #6f5710;
+  --wd-accent-deep: #f1e6bd;
+  --wd-on-accent: #100f0c;
+
+  --wd-info: #2f66c2;
+  --wd-ok: #23913f;
+  --wd-warn: #b08d1c;
+  --wd-danger: #c8432f;
+  --wd-info-low: #dfe8f7;   --wd-info-high: #1b3f7a;
+  --wd-ok-low: #dcefe1;     --wd-ok-high: #145a27;
+  --wd-warn-low: #f3e9c4;   --wd-warn-high: #5c4809;
+  --wd-danger-low: #f6ddd7; --wd-danger-high: #7a2418;
+
+  --wd-plate: var(--wd-bg-inset);
+  --wd-plate-hover: #ffffff;
+  --wd-code-bg: #fbf9f2;
+  --wd-inline-code-bg: rgba(16, 15, 12, 0.06);
+  --wd-scanline: rgba(16, 15, 12, 0.05);
+  --wd-grid-line: transparent;
+  --wd-bracket: transparent;
+  --wd-glow-a: rgba(176, 141, 28, 0.06);
+  --wd-glow-b: rgba(47, 102, 194, 0.045);
+  --wd-backdrop: rgba(60, 56, 45, 0.55);
+  --wd-shadow-lg: 0 18px 40px rgba(60, 56, 45, 0.18), 0 0 0 1px var(--wd-hairline-strong);
+  --wd-rail-1: var(--wd-info);
+  --wd-rail-2: var(--wd-ok);
+  --wd-rail-3: var(--wd-danger);
+  --wd-rail-4: var(--wd-accent);
+  --wd-theme-color: #fbf9f2;
+}

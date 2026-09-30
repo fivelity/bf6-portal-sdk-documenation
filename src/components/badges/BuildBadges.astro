@@ -1,0 +1,17 @@
+---
+/**
+ * BuildBadges — composes the header's build-provenance chips.
+ * Each chip is its own single-responsibility component (SRP): this file
+ * only decides which chips appear and in what order. Swap, add, or drop a
+ * chip here without touching Chip.astro or any individual badge's logic.
+ */
+import BuildToolBadge from './BuildToolBadge.astro';
+import ModelBadge from './ModelBadge.astro';
+import ElapsedBadge from './ElapsedBadge.astro';
+---
+
+<div class="wd-badge-row" role="note" aria-label="Build provenance">
+  <BuildToolBadge />
+  <ModelBadge />
+  <ElapsedBadge />
+</div>

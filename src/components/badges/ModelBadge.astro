@@ -1,0 +1,6 @@
+---
+import Chip from './Chip.astro';
+import { buildInfo } from '../../data/build-info';
+---
+
+<Chip icon="model" label="Using" value={buildInfo.model} title={`Model: ${buildInfo.model}`} />

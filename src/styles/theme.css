@@ -1,0 +1,31 @@
+/**
+ * THEME ENTRY
+ * Registered once in astro.config.mjs -> starlight({ customCss: [...] }).
+ *
+ * Load order matters:
+ *   1. palettes    - every registered colour palette's tokens (structure,
+ *      dark, and light for each). Only the one matching the current
+ *      [data-palette] attribute wins; see src/data/themes.ts.
+ *   2. tokens      - shared, palette-independent tokens plus the Starlight
+ *      custom-property mapping.
+ *   3. everything else - base/chrome/content/hero/reference/components,
+ *      which read the --wd- and --sl- custom properties only, never a
+ *      raw colour.
+ *
+ * Fonts are self-hosted via Fontsource (listed in astro.config.mjs's
+ * customCss array ahead of this file), not pulled from fonts.googleapis.com,
+ * which removes a render-blocking third-party request from every page.
+ */
+
+@import './theme/palettes/hud.css';
+@import './theme/palettes/manifest.css';
+
+@import './theme/tokens.css';
+@import './theme/base.css';
+@import './theme/chrome.css';
+@import './theme/content.css';
+@import './theme/hero.css';
+@import './theme/reference.css';
+
+@import './components/sidebar.css';
+@import './components/badges.css';

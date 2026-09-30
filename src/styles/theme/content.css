@@ -1,10 +1,10 @@
 /* ==========================================================================
-   FRONTLINE HUD THEME — 04 · CONTENT COMPONENTS
-   Tables, asides, code frames, Starlight <Card>/<LinkCard>/<Badge>/<Steps>/
-   <Tabs>/<FileTree>, and Expressive Code chrome.
+   CONTENT COMPONENTS — tables, asides, code frames, Starlight
+   <Card>/<LinkCard>/<Badge>/<Steps>/<Tabs>/<FileTree>, and the .wd-* raw-HTML
+   primitives (.wd-stats, .wd-kv, .wd-plate-grid). Palette-agnostic.
    ========================================================================== */
 
-/* ---------- Tables → HUD data readouts ---------- */
+/* ---------- Tables ---------- */
 .sl-markdown-content table {
   display: block;
   overflow-x: auto;
@@ -14,16 +14,16 @@
   border: 0;
 }
 .sl-markdown-content thead {
-  border-bottom: 2px solid var(--wd-brass);
+  border-bottom: var(--wd-thead-rule);
 }
 .sl-markdown-content th {
   font-family: var(--wd-font-mono);
-  font-size: 0.64rem;
+  font-size: 0.65rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   text-align: start;
-  color: var(--wd-brass);
+  color: var(--wd-th-color);
   padding: 0.55rem 1rem 0.55rem 0;
   background: none;
 }
@@ -45,34 +45,32 @@
   transition: background var(--wd-fast) var(--wd-ease);
 }
 .sl-markdown-content tbody tr:hover {
-  background: color-mix(in srgb, var(--wd-brass) 5%, transparent);
+  background: color-mix(in srgb, var(--wd-accent) 5%, transparent);
 }
 .sl-markdown-content td code {
   white-space: nowrap;
 }
 
-/* ---------- Asides → HUD alert panels with angular corner cut ----------
-   note = Lonestar blue · tip = Manticore green
-   caution = amber (Valkyra) · danger = red                                */
+/* ---------- Asides — note=info, tip=ok, caution=warn, danger=danger ---------- */
 .starlight-aside {
   border: var(--wd-rule-strong);
   border-inline-start-width: 3px;
-  border-radius: 0;
+  border-radius: var(--wd-radius);
   background: var(--wd-plate);
   padding: 1rem 1.25rem;
-  clip-path: var(--wd-clip-notch-tr);
+  clip-path: var(--wd-clip-notch);
 }
 .starlight-aside--note {
-  border-inline-start-color: var(--wd-lonestar);
-  background: color-mix(in srgb, var(--wd-lonestar) 7%, var(--wd-plate));
+  border-inline-start-color: var(--wd-info);
+  background: color-mix(in srgb, var(--wd-info) 7%, var(--wd-plate));
 }
 .starlight-aside--tip {
-  border-inline-start-color: var(--wd-manticore);
-  background: color-mix(in srgb, var(--wd-manticore) 7%, var(--wd-plate));
+  border-inline-start-color: var(--wd-ok);
+  background: color-mix(in srgb, var(--wd-ok) 7%, var(--wd-plate));
 }
 .starlight-aside--caution {
-  border-inline-start-color: var(--wd-valkyra);
-  background: color-mix(in srgb, var(--wd-valkyra) 8%, var(--wd-plate));
+  border-inline-start-color: var(--wd-warn);
+  background: color-mix(in srgb, var(--wd-warn) 8%, var(--wd-plate));
 }
 .starlight-aside--danger {
   border-inline-start-color: var(--wd-danger);
@@ -82,12 +80,12 @@
   font-family: var(--wd-font-mono);
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
 }
-.starlight-aside--note .starlight-aside__title { color: var(--wd-lonestar); }
-.starlight-aside--tip .starlight-aside__title { color: var(--wd-manticore); }
-.starlight-aside--caution .starlight-aside__title { color: var(--wd-valkyra); }
+.starlight-aside--note .starlight-aside__title { color: var(--wd-info); }
+.starlight-aside--tip .starlight-aside__title { color: var(--wd-ok); }
+.starlight-aside--caution .starlight-aside__title { color: var(--wd-warn); }
 .starlight-aside--danger .starlight-aside__title { color: var(--wd-danger); }
 .starlight-aside__content {
   font-size: 0.92rem;
@@ -97,16 +95,16 @@
   background: var(--wd-code-bg);
 }
 
-/* ---------- Expressive Code frames ---------- */
+/* ---------- Expressive Code ---------- */
 .expressive-code {
-  --ec-brdRad: 0px;
+  --ec-brdRad: var(--wd-radius);
   --ec-brdCol: var(--wd-hairline-strong);
   --ec-codeBg: var(--wd-code-bg);
   --ec-frm-edBg: var(--wd-code-bg);
   --ec-frm-trmTtbBg: var(--wd-plate);
   --ec-frm-edTabBarBg: var(--wd-plate);
   --ec-frm-edActTabBg: var(--wd-code-bg);
-  --ec-frm-edActTabIndTopCol: var(--wd-brass);
+  --ec-frm-edActTabIndTopCol: var(--wd-accent);
   --ec-frm-edActTabIndBtmCol: transparent;
   --ec-frm-edTabsMargBlkStart: 0;
   --ec-frm-shdw: none;
@@ -118,10 +116,10 @@
   letter-spacing: 0.02em;
 }
 .expressive-code .copy button {
-  border-radius: 0;
+  border-radius: var(--wd-radius);
 }
 
-/* ---------- <Card> / <CardGrid> → angular HUD tile grid ---------- */
+/* ---------- <Card> / <CardGrid> ---------- */
 .sl-markdown-content .card-grid {
   gap: 1px;
   background: var(--wd-hairline);
@@ -134,7 +132,7 @@
   padding: 1.25rem 1.3rem 1.15rem;
   position: relative;
   transition: background var(--wd-fast) var(--wd-ease);
-  clip-path: var(--wd-clip-notch-tr);
+  clip-path: var(--wd-clip-notch);
 }
 .card::before {
   content: '';
@@ -142,7 +140,7 @@
   inset-block: 0;
   inset-inline-start: 0;
   width: 3px;
-  background: var(--wd-brass);
+  background: var(--wd-accent);
   opacity: 0.7;
 }
 .card:hover {
@@ -150,86 +148,74 @@
 }
 .card .title {
   font-family: var(--wd-font-display);
-  font-weight: 700;
-  font-size: 1.25rem;
-  letter-spacing: 0.015em;
-  text-transform: uppercase;
+  font-weight: var(--wd-card-title-weight);
+  font-size: var(--wd-card-title-size);
+  letter-spacing: 0.012em;
+  text-transform: var(--wd-heading-transform);
 }
 .card .icon {
   border: var(--wd-rule-strong);
-  border-radius: 0;
-  background: var(--wd-brass-deep);
-  color: var(--wd-brass-bright);
+  border-radius: var(--wd-radius);
+  background: var(--wd-accent-deep);
+  color: var(--wd-accent-bright);
   padding: 0.2em;
 }
-:root[data-theme='light'] .card .icon {
-  background: #d3eef1;
-  color: #06525c;
-}
-/* Cycle status colours instead of brass-only rail: cyan -> blue -> green -> amber */
+/* Cycle rails across a grid: accent -> info -> ok -> warn */
 .card-grid > :nth-child(4n + 1) .card::before,
-.card-grid > .card:nth-child(4n + 1)::before { background: var(--wd-brass); }
+.card-grid > .card:nth-child(4n + 1)::before { background: var(--wd-rail-1); }
 .card-grid > :nth-child(4n + 2) .card::before,
-.card-grid > .card:nth-child(4n + 2)::before { background: var(--wd-lonestar); }
+.card-grid > .card:nth-child(4n + 2)::before { background: var(--wd-rail-2); }
 .card-grid > :nth-child(4n + 3) .card::before,
-.card-grid > .card:nth-child(4n + 3)::before { background: var(--wd-manticore); }
+.card-grid > .card:nth-child(4n + 3)::before { background: var(--wd-rail-3); }
 .card-grid > :nth-child(4n + 4) .card::before,
-.card-grid > .card:nth-child(4n + 4)::before { background: var(--wd-valkyra); }
+.card-grid > .card:nth-child(4n + 4)::before { background: var(--wd-rail-4); }
 
 /* ---------- <LinkCard> ---------- */
 .sl-link-card {
   border: var(--wd-rule-strong);
-  border-radius: 0;
+  border-radius: var(--wd-radius);
   background: var(--wd-plate);
   box-shadow: none;
-  clip-path: var(--wd-clip-notch-tr);
+  clip-path: var(--wd-clip-notch);
   transition:
     border-color var(--wd-fast) var(--wd-ease),
     background var(--wd-fast) var(--wd-ease);
 }
 .sl-link-card:hover {
-  border-color: var(--wd-brass);
+  border-color: var(--wd-accent);
   background: var(--wd-plate-hover);
 }
 .sl-link-card .title {
   font-family: var(--wd-font-display);
   font-weight: 700;
-  font-size: 1.1rem;
-  text-transform: uppercase;
+  font-size: 1.15rem;
+  text-transform: var(--wd-heading-transform);
 }
 
-/* ---------- <Badge> → HUD status chip (angular, not pill) ---------- */
+/* ---------- <Badge> ---------- */
 .sl-badge {
   font-family: var(--wd-font-mono);
-  font-size: 0.64rem;
+  font-size: 0.65rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  border-radius: 0;
+  border-radius: var(--wd-radius);
   padding: 0.1em 0.55em;
 }
 .sl-badge.default {
-  background: var(--wd-brass-deep);
-  border-color: var(--wd-brass);
-  color: var(--wd-brass-bright);
-}
-:root[data-theme='light'] .sl-badge.default {
-  background: #d3eef1;
-  color: #06525c;
+  background: var(--wd-accent-deep);
+  border-color: var(--wd-accent);
+  color: var(--wd-accent-bright);
 }
 
-/* ---------- <Steps> → HUD numbered ticks ---------- */
+/* ---------- <Steps> ---------- */
 .sl-steps > li::before {
   font-family: var(--wd-font-mono);
   font-weight: 600;
-  border-radius: 0;
-  background: var(--wd-brass-deep);
-  color: var(--wd-brass-bright);
-  border: 1px solid var(--wd-brass);
-}
-:root[data-theme='light'] .sl-steps > li::before {
-  background: #d3eef1;
-  color: #06525c;
+  border-radius: var(--wd-radius);
+  background: var(--wd-accent-deep);
+  color: var(--wd-accent-bright);
+  border: 1px solid var(--wd-accent);
 }
 .sl-steps > li::after {
   background: var(--wd-hairline-strong);
@@ -238,13 +224,13 @@
 /* ---------- <Tabs> ---------- */
 starlight-tabs [role='tab'] {
   font-family: var(--wd-font-mono);
-  font-size: 0.76rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 0.77rem;
+  letter-spacing: 0.03em;
+  text-transform: var(--wd-heading-transform);
 }
 starlight-tabs [role='tab'][aria-selected='true'] {
-  color: var(--wd-brass-bright);
-  border-bottom-color: var(--wd-brass);
+  color: var(--wd-accent-bright);
+  border-bottom-color: var(--wd-accent);
 }
 starlight-tabs .tablist-wrapper {
   border-bottom-color: var(--wd-hairline-strong);
@@ -252,16 +238,14 @@ starlight-tabs .tablist-wrapper {
 
 /* ---------- <FileTree> ---------- */
 starlight-file-tree {
-  border-radius: 0;
+  border-radius: var(--wd-radius);
   font-family: var(--wd-font-mono);
   font-size: 0.82rem;
   background: var(--wd-code-bg);
   border: var(--wd-rule-strong);
 }
 
-/* ---------- HUD primitives (opt-in via raw HTML in .mdx) ----------
-   Same class contract as the manifest theme's .wd-stats/.wd-kv/.wd-plate-grid
-   so existing .mdx content needs zero markup changes.               */
+/* ---------- Raw-HTML primitives (opt-in via .mdx) ---------- */
 .wd-doc-number {
   font-family: var(--wd-font-mono);
   font-size: 0.68rem;
@@ -285,27 +269,27 @@ starlight-file-tree {
   position: relative;
 }
 .wd-stat::after {
-  /* HUD corner tick, top-right */
   content: '';
   position: absolute;
   top: 0;
   right: 0;
   width: 8px;
   height: 8px;
-  border-top: 2px solid var(--wd-brass);
-  border-right: 2px solid var(--wd-brass);
-  opacity: 0.6;
+  border-top: 2px solid var(--wd-accent);
+  border-right: 2px solid var(--wd-accent);
+  opacity: var(--wd-tick-opacity);
 }
 .wd-stat b {
   display: block;
   font-family: var(--wd-font-mono);
-  font-size: 1.4rem;
+  font-size: 1.42rem;
   font-weight: 700;
-  color: var(--wd-brass-bright);
+  color: var(--wd-accent-bright);
+  font-variant-numeric: tabular-nums;
 }
 .wd-stat span {
-  font-size: 0.66rem;
-  letter-spacing: 0.08em;
+  font-size: 0.67rem;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--wd-muted);
 }
@@ -322,7 +306,7 @@ starlight-file-tree {
   background: var(--wd-plate);
   padding: 1.3rem 1.3rem 1.1rem;
   position: relative;
-  clip-path: var(--wd-clip-notch-tr);
+  clip-path: var(--wd-clip-notch);
 }
 .wd-plate::before {
   content: '';
@@ -330,19 +314,19 @@ starlight-file-tree {
   inset-block: 0;
   inset-inline-start: 0;
   width: 3px;
-  background: var(--wd-brass);
+  background: var(--wd-accent);
 }
-.wd-plate.is-blue::before { background: var(--wd-lonestar); }
-.wd-plate.is-green::before { background: var(--wd-manticore); }
-.wd-plate.is-red::before { background: var(--wd-danger); }
+.wd-plate.is-info::before { background: var(--wd-info); }
+.wd-plate.is-ok::before { background: var(--wd-ok); }
+.wd-plate.is-danger::before { background: var(--wd-danger); }
 .wd-plate h4 {
   margin: 0.2rem 0 0.4rem;
-  font-size: 1.3rem;
-  text-transform: uppercase;
+  font-size: 1.32rem;
+  text-transform: var(--wd-heading-transform);
 }
 .wd-plate .wd-tag {
   font-family: var(--wd-font-mono);
-  font-size: 0.64rem;
+  font-size: 0.65rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--wd-muted);

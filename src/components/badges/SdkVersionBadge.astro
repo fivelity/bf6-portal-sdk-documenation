@@ -1,0 +1,17 @@
+---
+/**
+ * SdkVersionBadge — shows the official four-part SDK version this build
+ * documents (e.g. "SDK 1.4.3.0"). Value comes from sdk-info.ts, which
+ * parses it out of the installed bf6-portal-mod-types package — never
+ * hand-typed. See ../../data/sdk-info.ts for how it's derived.
+ */
+import Chip from './Chip.astro';
+import { sdkStats } from '../../data/sdk-info';
+
+const title =
+  sdkStats.sdkVersionSource === 'header'
+    ? `Official BF6 Portal SDK version ${sdkStats.sdkVersion}, read from the installed bf6-portal-mod-types package`
+    : `Official BF6 Portal SDK version ${sdkStats.sdkVersion} (derived from bf6-portal-mod-types@${sdkStats.modTypesVersion})`;
+---
+
+<Chip icon="tag" label="SDK" value={sdkStats.sdkVersion} title={title} />

@@ -1,58 +1,27 @@
 /* ==========================================================================
-   FRONTLINE HUD THEME — 01 · TOKENS
-   BC2/BF3-era digital HUD: matte gunmetal canvas, cyan readout accent,
-   amber warning/caution, angular corner-cut geometry instead of brass
-   manifest plates. Drop-in replacement for wardogs-theme.css's tokens.css —
-   same custom-property contract, so chrome/content/hero/reference layers
-   need no changes beyond what's noted in each file's own header.
+   TOKENS — shared, palette-independent
+   Palette files (theme/palettes/*.css) supply every colour and every
+   shape/heading value. This file holds only what never changes between
+   palettes, plus the ONE mapping onto Starlight's custom properties, so
+   every built-in Starlight component inherits the active palette.
    ========================================================================== */
 
 :root {
-  /* --- HUD palette (dark) --- */
-  --wd-bg: #0a0d0f;
-  --wd-bg-raised: #10151a;
-  --wd-bg-inset: #070a0c;
-  --wd-paper: #d9e6ea;
-  --wd-paper-dim: #86a0aa;
-  --wd-muted: #4d6169;
-  --wd-hairline: #1c2a30;
-  --wd-hairline-strong: #2c414a;
-
-  /* "brass" slot repointed to HUD cyan so components that reference
-     --wd-brass-* everywhere else keep working with zero find/replace */
-  --wd-brass: #35d0e0;
-  --wd-brass-bright: #7cf2ff;
-  --wd-brass-deep: #0e2e33;
-
-  /* Faction colours -> HUD status colours: info=cyan(dup), ok=green,
-     warn=amber, danger=red. Kept distinct from brass so status asides
-     don't compete visually with the primary accent. */
-  --wd-lonestar: #3fa9f5; /* info  */
-  --wd-manticore: #5ad46a; /* ok    */
-  --wd-valkyra: #ff9c2e; /* warn (amber, BC2 caution-stripe) */
-  --wd-danger: #ff4a3d;
-
-  /* --- Type: condensed tactical display face for headings, mono for
-         data/HUD readouts, a clean humanist sans for body copy --- */
-  --wd-font-display: 'Oswald Variable', 'Oswald', 'Arial Narrow', Impact, sans-serif;
+  /* --- Type (display face comes from the palette) --- */
   --wd-font-body: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --wd-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular,
-    Menlo, Consolas, monospace;
+  --wd-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
+    Consolas, monospace;
 
-  /* --- Shape: HARD, ANGULAR. No radius at all — corners are cut with
-         clip-path per-component instead of rounded, which is what reads
-         as "digital HUD plate" rather than "printed manifest sheet". --- */
-  --wd-radius: 0px;
-  --wd-clip-sm: polygon(0 0, 100% 0, 100% 100%, 6px 100%, 0 calc(100% - 6px));
-  --wd-clip-md: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-  --wd-clip-notch-tr: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  /* --- Rules --- */
   --wd-rule: 1px solid var(--wd-hairline);
   --wd-rule-strong: 1px solid var(--wd-hairline-strong);
 
-  /* --- Motion: snappier, more "targeting reticle" than manifest's
-         gentle ease --- */
-  --wd-ease: cubic-bezier(0.16, 1, 0.3, 1);
-  --wd-fast: 0.12s;
+  /* --- Motion --- */
+  --wd-ease: var(--wd-easing, cubic-bezier(0.16, 1, 0.3, 1));
+
+  /* --- Sidebar geometry (used by components/sidebar.css) --- */
+  --wd-sb-toolbar-h: 3.5rem;
+  --wd-sb-row: 1.9rem;
 
   /* --- Starlight: type + layout --- */
   --sl-font: var(--wd-font-body);
@@ -60,144 +29,57 @@
   --sl-line-height: 1.65;
   --sl-line-height-headings: 1;
   --sl-content-width: 46rem;
-  --sl-sidebar-width: 18.5rem;
+  --sl-sidebar-width: 19rem;
   --sl-nav-height: 3.75rem;
   --sl-text-code: 0.86rem;
-}
 
-/* ===== Dark (default) ===== */
-:root,
-:root[data-theme='dark'] {
+  /* --- Starlight: palette mapping (resolves per-palette, per-mode) --- */
   --sl-color-black: var(--wd-bg);
   --sl-color-white: var(--wd-paper);
   --sl-color-gray-1: var(--wd-paper);
   --sl-color-gray-2: var(--wd-paper-dim);
-  --sl-color-gray-3: #6f8790;
+  --sl-color-gray-3: var(--wd-gray-3);
   --sl-color-gray-4: var(--wd-muted);
   --sl-color-gray-5: var(--wd-hairline-strong);
   --sl-color-gray-6: var(--wd-hairline);
+  --sl-color-gray-7: var(--wd-gray-7);
 
   --sl-color-text: var(--wd-paper-dim);
-  --sl-color-text-accent: var(--wd-brass-bright);
+  --sl-color-text-accent: var(--wd-accent-bright);
   --sl-color-text-invert: var(--wd-bg);
 
   --sl-color-bg: var(--wd-bg);
   --sl-color-bg-nav: var(--wd-bg-inset);
   --sl-color-bg-sidebar: var(--wd-bg-inset);
-  --sl-color-bg-inline-code: rgba(53, 208, 224, 0.08);
-  --sl-color-bg-accent: var(--wd-brass);
+  --sl-color-bg-inline-code: var(--wd-inline-code-bg);
+  --sl-color-bg-accent: var(--wd-accent);
 
-  --sl-color-accent-low: var(--wd-brass-deep);
-  --sl-color-accent: var(--wd-brass);
-  --sl-color-accent-high: var(--wd-brass-bright);
+  --sl-color-accent-low: var(--wd-accent-deep);
+  --sl-color-accent: var(--wd-accent);
+  --sl-color-accent-high: var(--wd-accent-bright);
 
   --sl-color-hairline: var(--wd-hairline);
   --sl-color-hairline-light: var(--wd-hairline-strong);
   --sl-color-hairline-shade: var(--wd-bg-inset);
-  --sl-color-backdrop-overlay: rgba(4, 6, 7, 0.82);
+  --sl-color-backdrop-overlay: var(--wd-backdrop);
 
-  /* note=lonestar(blue), tip=manticore(green), caution=valkyra(amber), danger=red */
-  --sl-color-blue: var(--wd-lonestar);
-  --sl-color-blue-low: #0f2438;
-  --sl-color-blue-high: #a9d4f5;
-  --sl-color-green: var(--wd-manticore);
-  --sl-color-green-low: #12281a;
-  --sl-color-green-high: #a8ecb2;
-  --sl-color-orange: var(--wd-valkyra);
-  --sl-color-orange-low: #2e1f0a;
-  --sl-color-orange-high: #ffd199;
+  --sl-color-blue: var(--wd-info);
+  --sl-color-blue-low: var(--wd-info-low);
+  --sl-color-blue-high: var(--wd-info-high);
+  --sl-color-green: var(--wd-ok);
+  --sl-color-green-low: var(--wd-ok-low);
+  --sl-color-green-high: var(--wd-ok-high);
+  --sl-color-orange: var(--wd-warn);
+  --sl-color-orange-low: var(--wd-warn-low);
+  --sl-color-orange-high: var(--wd-warn-high);
   --sl-color-red: var(--wd-danger);
-  --sl-color-red-low: #331410;
-  --sl-color-red-high: #ffb3ab;
-  --sl-color-purple: var(--wd-brass);
-  --sl-color-purple-low: var(--wd-brass-deep);
-  --sl-color-purple-high: var(--wd-brass-bright);
+  --sl-color-red-low: var(--wd-danger-low);
+  --sl-color-red-high: var(--wd-danger-high);
+  --sl-color-purple: var(--wd-accent);
+  --sl-color-purple-low: var(--wd-accent-deep);
+  --sl-color-purple-high: var(--wd-accent-bright);
 
   --sl-shadow-sm: none;
   --sl-shadow-md: 0 0 0 1px var(--wd-hairline-strong);
-  --sl-shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--wd-hairline-strong);
-
-  /* Theme-only helpers */
-  --wd-canvas-glow-a: rgba(53, 208, 224, 0.05);
-  --wd-canvas-glow-b: rgba(255, 156, 46, 0.035);
-  --wd-plate: var(--wd-bg-inset);
-  --wd-plate-hover: var(--wd-bg-raised);
-  --wd-code-bg: #060809;
-  --wd-scanline: rgba(53, 208, 224, 0.05);
-  /* HUD-specific: subtle grid overlay + corner-bracket colour */
-  --wd-grid-line: rgba(53, 208, 224, 0.035);
-  --wd-bracket: var(--wd-brass);
-}
-
-/* ===== Light: overcast daylight HUD (still legible tactical readout) ===== */
-:root[data-theme='light'] {
-  --sl-color-black: #eef2f3;
-  --sl-color-white: #10181b;
-  --sl-color-gray-1: #162225;
-  --sl-color-gray-2: #33474d;
-  --sl-color-gray-3: #4f666c;
-  --sl-color-gray-4: #758d93;
-  --sl-color-gray-5: #c3d2d5;
-  --sl-color-gray-6: #dde8ea;
-  --sl-color-gray-7: #e9f1f2;
-
-  --sl-color-text: #33474d;
-  --sl-color-text-accent: #0a7d8c;
-  --sl-color-text-invert: #eef2f3;
-
-  --sl-color-bg: #eef2f3;
-  --sl-color-bg-nav: #f6f9fa;
-  --sl-color-bg-sidebar: #f6f9fa;
-  --sl-color-bg-inline-code: rgba(10, 125, 140, 0.08);
-  --sl-color-bg-accent: #0a7d8c;
-
-  --sl-color-accent-low: #d3eef1;
-  --sl-color-accent: #0a7d8c;
-  --sl-color-accent-high: #06525c;
-
-  --sl-color-hairline: #d3e0e2;
-  --sl-color-hairline-light: #c3d2d5;
-  --sl-color-hairline-shade: #d3e0e2;
-  --sl-color-backdrop-overlay: rgba(22, 34, 37, 0.5);
-
-  --sl-color-blue: #1f6fb8;
-  --sl-color-blue-low: #dceaf7;
-  --sl-color-blue-high: #143f6b;
-  --sl-color-green: #1f8f42;
-  --sl-color-green-low: #dcf1e2;
-  --sl-color-green-high: #14512a;
-  --sl-color-orange: #c97418;
-  --sl-color-orange-low: #f7e6cf;
-  --sl-color-orange-high: #6b3d0b;
-  --sl-color-red: #c8402f;
-  --sl-color-red-low: #f7dcd7;
-  --sl-color-red-high: #6b1f16;
-  --sl-color-purple: #0a7d8c;
-  --sl-color-purple-low: #d3eef1;
-  --sl-color-purple-high: #06525c;
-
-  --sl-shadow-sm: none;
-  --sl-shadow-md: 0 0 0 1px #c3d2d5;
-  --sl-shadow-lg: 0 20px 48px rgba(16, 24, 27, 0.14), 0 0 0 1px #c3d2d5;
-
-  --wd-canvas-glow-a: rgba(10, 125, 140, 0.05);
-  --wd-canvas-glow-b: rgba(201, 116, 24, 0.04);
-  --wd-plate: #f6f9fa;
-  --wd-plate-hover: #ffffff;
-  --wd-code-bg: #f6f9fa;
-  --wd-scanline: rgba(10, 125, 140, 0.04);
-  --wd-grid-line: rgba(10, 125, 140, 0.03);
-  --wd-bracket: #0a7d8c;
-
-  /* Re-point raw tokens for light-mode components */
-  --wd-paper: #162225;
-  --wd-paper-dim: #33474d;
-  --wd-muted: #758d93;
-  --wd-hairline: #d3e0e2;
-  --wd-hairline-strong: #c3d2d5;
-  --wd-bg-inset: #f6f9fa;
-  --wd-bg-raised: #ffffff;
-  --wd-brass: #0a7d8c;
-  --wd-brass-bright: #06525c;
-  --wd-brass-deep: #d3eef1;
+  --sl-shadow-lg: var(--wd-shadow-lg);
 }
