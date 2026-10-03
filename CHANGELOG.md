@@ -180,7 +180,7 @@ light/dark/auto mode — pick a palette *and* a mode, in any combination:
 
 ### Files touched
 
-```
+```fs
 astro.config.mjs                          fixed missing component registrations
 package.json                              added docs:verify script; reordered docs:api
 
