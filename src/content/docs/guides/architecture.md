@@ -3,26 +3,23 @@ title: Architecture & Core Concepts
 description: The runtime rules every Portal mode built on this SDK needs to respect.
 ---
 
-Portal's scripting runtime plays by a few rules that you won't find anywhere
-in the type signatures. That's the tricky part — break one of these and
-nothing complains at compile time. Your mode just quietly does the wrong
-thing once it's live, which is a much worse time to find out. So let's get
-them out in the open now.
+Portal's scripting runtime has a handful of hard constraints that aren't
+obvious from the type signatures alone. Getting these wrong doesn't produce a
+compile error — it produces a mode that silently misbehaves at runtime.
 
-## Only one handler gets to answer each event
+## Single-owner event handlers
 
-Here's the thing about Portal's event system: it scans your compiled mode
-for exported functions with recognized handler names — `OnPlayerDied`,
-`OngoingPlayer`, `OnCapturePointCaptured`, and 76 more living under
-`mod.EventHandlerSignatures` — and calls them directly when the moment
-comes. But it only ever keeps **one** implementation per handler name. Export
-`OnPlayerDied` from two different files and the build won't warn you; it'll
-just quietly drop one of them.
+The Portal runtime scans your compiled mode for exported functions matching
+an event handler name (`OnPlayerDied`, `OngoingPlayer`,
+`OnCapturePointCaptured`, and 76 others under
+`mod.EventHandlerSignatures`) and calls them directly when that event
+fires. It allows **exactly one exported implementation of each handler name
+per compiled mode**. If two files in your codebase both export a function
+called `OnPlayerDied`, only one silently survives the build.
 
-`bf6-portal-utils` exists partly to make this problem disappear. Its
-[`Events` module](/utils/events/) claims each raw handler exactly once, then
-lets the rest of your codebase subscribe to it from as many places as you
-want:
+`bf6-portal-utils` solves this with its
+[`Events` module](/utils/events/), which owns every raw handler once and
+lets the rest of your codebase subscribe from as many places as needed:
 
 ```ts
 import { Events } from 'bf6-portal-utils/events';
@@ -32,23 +29,22 @@ Events.OnPlayerDied.subscribe((victim, killer, deathType, weapon) => {
 });
 ```
 
-Once `Events` is in the picture, don't export a raw handler yourself —
-other `bf6-portal-utils` modules (`UI`, `Raycast`, `Clocks`) are quietly
-relying on `Events` to own those hooks, and a hand-written handler with the
-same name will step on their toes.
+Once you adopt `Events`, **never export a raw event handler function
+yourself** — several other `bf6-portal-utils` modules (`UI`, `Raycast`,
+`Clocks`) rely on `Events` owning those hooks internally and will conflict
+with a hand-written handler of the same name.
 
-Want the full rulebook? [Event Handlers & Enums](/mod-types/events-and-enums/)
-covers it, and [bf6-portal-utils → Events](/utils/events/) is where the
-subscription API lives.
+See [Event Handlers & Enums](/mod-types/events-and-enums/) for the full
+rule, and [bf6-portal-utils → Events](/utils/events/) for the subscription
+API.
 
-## If it's not in the types, it doesn't exist
+## No fabricated symbols
 
-Unofficial tutorials and AI-generated snippets have a habit of inventing
-Portal APIs that sound plausible but aren't real. The safest rule: trust the
-installed `.d.ts` and nothing else — our [API Reference](/reference/mod-types/)
-is generated straight from it, so if a symbol isn't there, it isn't real.
-Here are a few mix-ups worth knowing before they cost you a debugging
-session:
+Because unofficial tutorials and AI-generated snippets sometimes invent
+Portal APIs that don't exist, treat the installed `.d.ts` as the only
+source of truth — this site's [API Reference](/reference/mod-types/) is
+generated straight from it. A few real vs. commonly-assumed distinctions
+worth knowing up front:
 
 | Real API | Common mistake |
 | --- | --- |
@@ -58,44 +54,40 @@ session:
 | `console.log(...)` only | `console.error` / `console.warn` — the injected `console` global has a single `log` method |
 | `mod.Wait(seconds)` returns `Promise<void>` | A synchronous sleep — `Wait` must be `await`ed inside an `async` handler |
 
-Still unsure? The [API Reference](/reference/mod-types/) is generated
-directly from the type package — if you don't see it listed there, it
-doesn't exist.
+When in doubt, check the [API Reference](/reference/mod-types/) — it's
+generated from the type package, so anything not listed there doesn't exist.
 
-## ObjIds come from the scene, not your imagination
+## ObjIds are scene data, not constants you invent
 
-Every `CapturePoint`, `AreaTrigger`, `Spawner`, or other scene entity your
-mode touches boils down to an integer ObjId via `mod.GetObjId`, and that
-number has to match something actually placed in the level's scene data.
-There's no type-level safety net here — the compiler has no idea which
-integers are valid for a given map, so a stale or mistyped ID fails
-silently at runtime, not at build time. Keep every ObjId in one config
-module instead of scattering numeric literals through your codebase, and
-future-you will thank present-you.
+Every `CapturePoint`, `AreaTrigger`, `Spawner`, and other scene entity your
+mode references resolves to an integer ObjId via `mod.GetObjId`, and that
+integer must match an object actually placed in the level's scene data.
+Centralize these in one config module and never inline a numeric ObjId
+literal elsewhere — a typo'd or stale ID fails at runtime, not at compile
+time, since the type system has no way to know which integers are valid for
+a given map.
 
-## QuickJS doesn't know what `setTimeout` is
+## QuickJS has no native timers
 
-Portal mode scripts run inside QuickJS, which has no `setTimeout` or
-`setInterval` — that's just not a thing here. The only native way to delay
-or repeat something is `mod.Wait(seconds)`, an awaitable pause you call from
-inside an `async` handler. If you want cancellable timers, several running
-at once, or something that just *feels* like `setTimeout`/`setInterval`
-again, reach for the [`Timers` module](/utils/timers-and-clocks/) in
-`bf6-portal-utils` — it builds that familiar shape on top of `mod.Wait`
-under the hood.
+Portal mode scripts run in a QuickJS runtime, which does **not** ship
+`setTimeout`/`setInterval`. The only native primitive for delayed or
+recurring execution is `mod.Wait(seconds)` (an awaitable delay inside an
+`async` handler). For cancellable timers, concurrent timers, or the
+familiar `setTimeout`/`setInterval` API shape, use the
+[`Timers` module](/utils/timers-and-clocks/) from `bf6-portal-utils`, which
+implements them on top of `mod.Wait` internally.
 
-## UI plays by the same one-owner rule
+## UI ownership follows the same single-owner rule
 
 The [`UI` module](/utils/ui-components/) subscribes to
-`OnPlayerUIButtonEvent` through `Events` the moment it loads, so it can
-dispatch your button callbacks automatically. Bring in `UI` (or `Raycast`,
-which owns `OnRayCastHit`/`OnRayCastMissed` the same way) and the deal is:
-all of *your* subscriptions need to go through `Events` too. Export a raw
-handler for something a `bf6-portal-utils` module already owns, and you're
-back to the same silent conflict from the top of this page.
+`OnPlayerUIButtonEvent` via `Events` at load time to dispatch button
+callbacks automatically. If you bring in `UI` (or `Raycast`, which
+similarly owns `OnRayCastHit`/`OnRayCastMissed`), you must route **all**
+your own event subscriptions through `Events` too — exporting a raw
+handler of your own for an event a `bf6-portal-utils` module already owns
+will conflict with it.
 
-## Next up: actually building something
+## Next: build something
 
-You've got the ground rules — now let's put them to use. The
-[Quickstart Guide](/guides/quickstart/) walks through scaffolding a minimal
-mode that brings both packages together.
+The [Quickstart Guide](/guides/quickstart/) walks through scaffolding a
+minimal mode that uses both packages together.
