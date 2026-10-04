@@ -14,11 +14,29 @@ export interface PaletteDef {
   readonly id: string;
   readonly label: string;
   readonly description: string;
+  /**
+   * Decorative swatch hex shown next to the palette's name in the picker —
+   * the palette's own `--wd-accent` (dark variant), hand-copied rather than
+   * read live since it labels an *option in a closed `<select>`'s listbox*,
+   * a context CSS custom properties can't reach. Keep in sync with
+   * `--wd-accent` in `./theme/palettes/<id>.css`.
+   */
+  readonly swatch: string;
 }
 
 export const PALETTES = [
-  { id: 'hud', label: 'Frontline HUD', description: 'Gunmetal canvas, cyan readouts, angular corner cuts.' },
-  { id: 'manifest', label: 'Wardogs Manifest', description: 'Warm paper tones, brass accents, square plates.' },
+  {
+    id: 'hud',
+    label: 'Frontline HUD',
+    description: 'Gunmetal canvas, cyan readouts, angular corner cuts.',
+    swatch: '#35d0e0',
+  },
+  {
+    id: 'manifest',
+    label: 'Wardogs Manifest',
+    description: 'Warm paper tones, brass accents, square plates.',
+    swatch: '#c9a227',
+  },
 ] as const satisfies readonly PaletteDef[];
 
 export type PaletteId = (typeof PALETTES)[number]['id'];

@@ -117,13 +117,81 @@ dialog[aria-label] {
   color: var(--sl-color-white);
 }
 
-/* ---------- Theme / language / palette selects ---------- */
+/* ---------- Theme / language selects ---------- */
 starlight-theme-select select,
-starlight-lang-select select,
-.wd-palette-select select {
+starlight-lang-select select {
   border-radius: var(--wd-radius);
   font-family: var(--wd-font-mono);
   font-size: 0.78rem;
+}
+
+/* ---------- Palette select ----------
+   Hand-rolled (not Starlight's <Select>) so the trigger can show a live
+   colour swatch instead of a generic menu glyph. Structure/sizing vars
+   mirror Select.astro's own `label`/`.icon`/`select`/`.caret` layout so it
+   sits pixel-identical next to the built-in theme + language pickers. */
+.wd-palette-select label {
+  --sl-label-icon-size: 0.7rem;
+  --sl-caret-size: 1.25rem;
+  --sl-inline-padding: 0.5rem;
+  --sl-select-width: 7.5em;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--wd-paper-dim);
+}
+.wd-palette-select label:hover {
+  color: var(--sl-color-white);
+}
+.wd-palette-select .icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.wd-palette-select .label-icon {
+  inset-inline-start: 0;
+}
+.wd-palette-select .caret {
+  inset-inline-end: 0;
+  width: var(--sl-caret-size);
+  height: var(--sl-caret-size);
+  color: var(--wd-muted);
+}
+/* The swatch: a small ring that always shows the ACTIVE palette's own
+   --wd-accent — it needs no script to stay in sync, because --wd-accent
+   itself changes the instant `data-palette` flips on <html>. */
+.wd-palette-swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--wd-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--wd-accent) 25%, transparent);
+}
+.wd-palette-select select {
+  border: 0;
+  border-radius: var(--wd-radius);
+  padding-block: 0.625rem;
+  padding-inline: calc(var(--sl-label-icon-size) + var(--sl-inline-padding) + 0.4rem)
+    calc(var(--sl-caret-size) + var(--sl-inline-padding) + 0.25rem);
+  margin-inline: calc(var(--sl-inline-padding) * -1);
+  width: calc(var(--sl-select-width) + var(--sl-inline-padding) * 2);
+  background-color: transparent;
+  font-family: var(--wd-font-mono);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  color: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+.wd-palette-select option {
+  background-color: var(--sl-color-bg-nav);
+  font-family: var(--wd-font-mono);
+  /* `color` is set per-option inline (each palette's own swatch hex) so the
+     open listbox shows which hue belongs to which choice; Safari ignores
+     this on <option> and falls back to its own listbox styling, which is
+     a harmless no-op, not a breakage. */
 }
 
 /* ---------- Footer meta ---------- */

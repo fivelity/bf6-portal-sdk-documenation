@@ -41,6 +41,12 @@
   color: var(--sl-color-white);
   font-weight: 500;
 }
+/* Zebra striping: deliberate and uniform, so a long reference table (the
+   21-module list, say) reads as "every other row is tinted" rather than
+   leaving row shading to look like a stray hover state caught mid-screenshot. */
+.sl-markdown-content tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--wd-hairline) 40%, transparent);
+}
 .sl-markdown-content tbody tr {
   transition: background var(--wd-fast) var(--wd-ease);
 }

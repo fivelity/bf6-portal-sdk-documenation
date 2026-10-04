@@ -1,17 +1,60 @@
 ---
 /**
- * BuildBadges — composes the header's build-provenance chips.
- * Each chip is its own single-responsibility component (SRP): this file
- * only decides which chips appear and in what order. Swap, add, or drop a
- * chip here without touching Chip.astro or any individual badge's logic.
+ * BuildBadges — the header's build-provenance disclosure.
+ *
+ * Previously rendered three always-visible chips (Built with / Using /
+ * Elapsed) side by side, which ate a third of the header's width and was
+ * the first thing to get clipped on a narrower viewport. Now it's a single
+ * chip-styled `<details>` trigger ("Build info") that opens a small panel
+ * holding the same three rows — still each its own single-responsibility
+ * component (SRP): this file only decides which rows appear and in what
+ * order. Swap, add, or drop a row here without touching Chip.astro or any
+ * individual badge's logic.
+ *
+ * `<details>` gives the open/close toggle for free with no required JS;
+ * the one inline script below only adds the two things it doesn't do
+ * natively — close on outside click, and close on Escape with focus
+ * returned to the trigger — mirroring the minimal, justified-per-feature
+ * client JS already used by PaletteSelect.astro.
  */
 import BuildToolBadge from './BuildToolBadge.astro';
 import ModelBadge from './ModelBadge.astro';
 import ElapsedBadge from './ElapsedBadge.astro';
 ---
 
-<div class="wd-badge-row" role="note" aria-label="Build provenance">
-  <BuildToolBadge />
-  <ModelBadge />
-  <ElapsedBadge />
-</div>
+<details class="wd-build-popover">
+  <summary class="wd-chip wd-build-popover__trigger" aria-label="Build provenance">
+    <svg class="wd-chip__icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6" />
+      <path d="M12 11v5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+      <circle cx="12" cy="7.75" r="1.1" fill="currentColor" />
+    </svg>
+    <span class="wd-chip__label">Build</span>
+    <span class="wd-chip__value">info</span>
+  </summary>
+  <div class="wd-build-popover__panel" role="group" aria-label="Build provenance details">
+    <BuildToolBadge />
+    <ModelBadge />
+    <ElapsedBadge />
+  </div>
+</details>
+
+<script>
+  for (const el of document.querySelectorAll('.wd-build-popover')) {
+    const details = el as HTMLDetailsElement;
+    const summary = details.querySelector('summary');
+
+    document.addEventListener('click', (e) => {
+      if (details.open && e.target instanceof Node && !details.contains(e.target)) {
+        details.open = false;
+      }
+    });
+
+    details.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && details.open) {
+        details.open = false;
+        summary?.focus();
+      }
+    });
+  }
+</script>

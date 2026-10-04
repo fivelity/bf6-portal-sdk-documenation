@@ -18,7 +18,7 @@ doesn't exist. This matters for the [API Reference](/reference/utils/) too:
 it's organized as 21 separate module trees, one per subpath, not one flat
 namespace.
 
-## Installation
+### Installation
 
 ```bash
 pnpm add -D bf6-portal-utils
@@ -54,7 +54,7 @@ it, since every module's public API is expressed in terms of `mod.*` types.
 | **FFADropIns** | `bf6-portal-utils/ffa-drop-ins` | Free-for-all spawning via developer-curated drop-in points, with a deploy-delay prompt |
 | **FFASpawnPoints** | `bf6-portal-utils/ffa-spawn-points` | Free-for-all spawning via developer-curated fixed spawn points |
 
-## Design intent
+### Design intent
 
 Every module here is a thin, fully-typed wrapper over real `mod.*` calls —
 it never hides a call behind something that returns `any`, and several
@@ -64,7 +64,7 @@ module's behavior doesn't match what you observe at runtime, check the
 [API Reference → utils](/reference/utils/) for the exact generated
 signature before assuming the module is wrong.
 
-## Bundling
+### Bundling
 
 Portal expects one script file, not an ES module graph. The community
 [`bf6-portal-bundler`](https://www.npmjs.com/package/bf6-portal-bundler)

@@ -14,12 +14,6 @@
   gap: 0.6rem;
 }
 
-.wd-badge-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
 .wd-chip {
   display: inline-flex;
   align-items: center;
@@ -64,14 +58,83 @@
   flex-shrink: 0;
 }
 
-/* Progressive shrink so the centred search box always has room */
+/* ---------- Build-info popover ----------
+   A single chip-styled <details> trigger replaces what used to be three
+   always-visible chips. The trigger reuses .wd-chip as-is; only the panel
+   and the open-state caret are new. */
+.wd-build-popover {
+  position: relative;
+}
+.wd-build-popover__trigger {
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+.wd-build-popover__trigger::-webkit-details-marker {
+  display: none;
+}
+.wd-build-popover__trigger::after {
+  content: '';
+  width: 0.5em;
+  height: 0.5em;
+  margin-inline-start: 0.1em;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  color: var(--wd-muted);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform var(--wd-fast) var(--wd-ease);
+}
+.wd-build-popover[open] .wd-build-popover__trigger {
+  border-color: var(--wd-accent);
+  background: var(--wd-plate-hover);
+}
+.wd-build-popover[open] .wd-build-popover__trigger::after {
+  transform: translateY(2px) rotate(225deg);
+}
+.wd-build-popover__panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.3rem;
+  min-width: 13rem;
+  padding: 0.6rem;
+  border: var(--wd-rule-strong);
+  border-radius: var(--wd-radius);
+  background: var(--sl-color-bg-nav);
+  box-shadow: var(--sl-shadow-lg);
+  clip-path: var(--wd-clip-sm);
+}
+.wd-build-popover__panel .wd-chip {
+  justify-content: flex-start;
+  width: 100%;
+  border-color: transparent;
+  background: none;
+}
+.wd-build-popover__panel .wd-chip:hover {
+  background: var(--wd-plate);
+  border-color: transparent;
+}
+.wd-build-popover__panel .wd-chip__label {
+  display: inline;
+}
+
+/* Progressive shrink so the centred search box always has room.
+   Scoped with `>` so it only ever collapses the standalone SDK-version
+   chip's label — never the build-info trigger's (it's already just one
+   word) or the labels inside its open panel (.wd-build-popover__panel
+   restores those unconditionally above, since the panel is only ever
+   visible as an explicit, user-opened overlay with room to spare). */
 @media (max-width: 78rem) {
-  .wd-chip__label {
+  .wd-header-right > .wd-chip > .wd-chip__label {
     display: none;
   }
 }
 @media (max-width: 60rem) {
-  .wd-badge-row {
+  .wd-build-popover {
     display: none;
   }
 }

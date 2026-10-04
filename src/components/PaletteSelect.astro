@@ -2,24 +2,52 @@
 /**
  * PaletteSelect — a second, independent "theme" axis: which colour palette
  * (Frontline HUD / Wardogs Manifest) is active, orthogonal to Starlight's
- * own light/dark/auto mode. Reuses Starlight's <Select> so it matches the
- * built-in theme picker pixel-for-pixel rather than inventing new chrome.
+ * own light/dark/auto mode.
+ *
+ * Markup intentionally mirrors Starlight's own <Select> (same `label` /
+ * `.icon` / `select` / `.caret` structure — see chrome.css's
+ * `.wd-palette-select select` rule) so it sits pixel-for-pixel next to the
+ * built-in theme picker, but swaps the generic menu icon for a live colour
+ * swatch: a dot painted with the *currently active* palette's own
+ * `--wd-accent`, so the trigger itself shows which palette is on, not just
+ * a name. Each option also carries a small decorative swatch (`p.swatch`)
+ * so the two choices are visually distinct in the open listbox, not just
+ * by label text — labels are short ("HUD" / "Manifest") so the value never
+ * clips inside the select's fixed width; the full name is still available
+ * as the option text read by screen readers and as the trigger's title.
  *
  * Persisted to localStorage under PALETTE_STORAGE_KEY (src/data/themes.ts)
  * and applied via a `data-palette` attribute on <html>, read by every
  * palette file in src/styles/theme/palettes/*.css.
  */
-import Select from '@astrojs/starlight/components/Select.astro';
 import { PALETTES, DEFAULT_PALETTE, PALETTE_STORAGE_KEY, PALETTE_ATTRIBUTE } from '../data/themes';
+
+const SHORT_LABEL: Record<string, string> = { hud: 'HUD', manifest: 'Manifest' };
 ---
 
 <starlight-palette-select class="wd-palette-select">
-  <Select
-    icon="seti:plan"
-    label="Select colour palette"
-    width="8em"
-    options={PALETTES.map((p) => ({ label: p.label, value: p.id, selected: p.id === DEFAULT_PALETTE }))}
-  />
+  <label title="Select colour palette">
+    <span class="sr-only">Select colour palette</span>
+    <span class="wd-palette-swatch icon label-icon" aria-hidden="true"></span>
+    <select autocomplete="off">
+      {
+        PALETTES.map((p) => (
+          <option
+            value={p.id}
+            selected={p.id === DEFAULT_PALETTE}
+            style={`color: ${p.swatch}`}
+            title={p.label}
+            aria-label={p.label}
+          >
+            ● {SHORT_LABEL[p.id] ?? p.label}
+          </option>
+        ))
+      }
+    </select>
+    <svg class="icon caret" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </label>
 </starlight-palette-select>
 
 <script define:vars={{ storageKey: PALETTE_STORAGE_KEY, attr: PALETTE_ATTRIBUTE, ids: PALETTES.map((p) => p.id) }}>
