@@ -1,0 +1,92 @@
+---
+/**
+ * HoverCard — a small icon-only chip (same footprint as the header's
+ * GitHub icon) that reveals a detail panel on hover, keyboard focus, or
+ * click/tap, instead of spelling the value out in a full-width chip.
+ *
+ * Mouse + keyboard work from CSS alone (`:hover` / `:focus-within` on
+ * `.wd-hovercard`) — no script required for the panel to open at all. The
+ * one shared script below is pure enhancement on top of that baseline:
+ *   - click/tap toggles a `data-open` attribute, so touch devices (which
+ *     have no real `:hover`) and anyone who wants the panel to stay put
+ *     while they read it can get the same result as hovering;
+ *   - opening one hovercard closes any other that was click-pinned open;
+ *   - outside click and Escape close a click-pinned panel, returning
+ *     focus to the trigger on Escape.
+ * It's written once here and Astro dedupes it across every usage of this
+ * component on a page, so N hovercards cost one script, not N.
+ *
+ * Usage:
+ *   <HoverCard label="Build provenance">
+ *     <Fragment slot="icon"><path d="..." /></Fragment>
+ *     ...panel content...
+ *   </HoverCard>
+ */
+interface Props {
+  /** Accessible name for the trigger button AND the panel it opens. */
+  label: string;
+  /** Which side of the trigger the panel opens toward. Default: right. */
+  align?: 'left' | 'right';
+}
+const { label, align = 'right' } = Astro.props;
+
+// Module-level counter → stable, unique aria-controls id per usage without
+// a client-side UUID call; fine since it only wires up aria, not hydration.
+let count = 0;
+const id = `wd-hovercard-${++count}`;
+---
+
+<span class="wd-hovercard" data-align={align}>
+  <button type="button" class="wd-icon-chip" aria-label={label} aria-expanded="false" aria-controls={id}>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <slot name="icon" />
+    </svg>
+  </button>
+  <div class="wd-hovercard__panel" id={id} role="group" aria-label={label}>
+    <slot />
+  </div>
+</span>
+
+<script>
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.wd-hovercard'));
+
+  function close(card: HTMLElement) {
+    card.removeAttribute('data-open');
+    card.querySelector('button')?.setAttribute('aria-expanded', 'false');
+  }
+  function closeAllExcept(except?: HTMLElement) {
+    for (const c of cards) if (c !== except) close(c);
+  }
+
+  for (const card of cards) {
+    const btn = card.querySelector('button');
+    btn?.addEventListener('click', () => {
+      const wasOpen = card.hasAttribute('data-open');
+      closeAllExcept(card);
+      if (wasOpen) {
+        close(card);
+      } else {
+        card.setAttribute('data-open', '');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!(e.target instanceof Node)) return;
+    for (const card of cards) {
+      if (card.hasAttribute('data-open') && !card.contains(e.target)) close(card);
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    for (const card of cards) {
+      if (card.hasAttribute('data-open')) {
+        const btn = card.querySelector('button');
+        close(card);
+        (btn as HTMLElement | null)?.focus();
+      }
+    }
+  });
+</script>

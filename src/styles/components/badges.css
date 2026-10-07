@@ -1,11 +1,14 @@
 /* ==========================================================================
-   BADGES — header build/version chips.
+   BADGES — header build/version hovercards.
    Deliberately NOT the "service ribbon" look (woven fabric bar, gold bezel):
-   that read as bulky/decorative next to a technical reference site. This is
-   a flat, single-row chip: a small dot/icon, a muted label, a value in mono.
-   Palette-agnostic; renders correctly under both palette + both modes,
-   which the old ribbon version did not (its colours were hard-coded and
-   never touched --wd-* tokens, so it went invisible on the HUD palette).
+   that read as bulky/decorative next to a technical reference site. Each
+   piece of build/version metadata lives behind a small icon-only chip —
+   the same footprint as the header's GitHub icon — and reveals its value
+   in a plate-styled hovercard panel on hover, focus, or click (see
+   HoverCard.astro). Palette-agnostic; renders correctly under both
+   palette + both modes, which the old always-visible ribbon version did
+   not (its colours were hard-coded and never touched --wd-* tokens, so it
+   went invisible on the HUD palette).
    ========================================================================== */
 
 .wd-header-right {
@@ -14,6 +17,7 @@
   gap: 0.6rem;
 }
 
+/* ---------- Chip (used for rows INSIDE a hovercard panel) ---------- */
 .wd-chip {
   display: inline-flex;
   align-items: center;
@@ -58,43 +62,50 @@
   flex-shrink: 0;
 }
 
-/* ---------- Build-info popover ----------
-   A single chip-styled <details> trigger replaces what used to be three
-   always-visible chips. The trigger reuses .wd-chip as-is; only the panel
-   and the open-state caret are new. */
-.wd-build-popover {
+/* ---------- HoverCard: icon-only trigger ----------
+   Same clickable footprint as Starlight's own GitHub icon (header/sl-flex
+   links), but kept as a bordered plate — like every other header chip —
+   so it still reads as "hover/press for info", not as a nav link. */
+.wd-hovercard {
   position: relative;
+  display: inline-flex;
 }
-.wd-build-popover__trigger {
+.wd-icon-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: var(--wd-rule-strong);
+  border-radius: var(--wd-radius);
+  background: var(--wd-plate);
+  color: var(--wd-paper-dim);
+  clip-path: var(--wd-clip-sm);
   cursor: pointer;
-  user-select: none;
-  list-style: none;
+  transition: border-color var(--wd-fast) var(--wd-ease), background var(--wd-fast) var(--wd-ease),
+    color var(--wd-fast) var(--wd-ease);
 }
-.wd-build-popover__trigger::-webkit-details-marker {
-  display: none;
+.wd-icon-chip svg {
+  width: 0.95rem;
+  height: 0.95rem;
 }
-.wd-build-popover__trigger::after {
-  content: '';
-  width: 0.5em;
-  height: 0.5em;
-  margin-inline-start: 0.1em;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  color: var(--wd-muted);
-  transform: translateY(-2px) rotate(45deg);
-  transition: transform var(--wd-fast) var(--wd-ease);
-}
-.wd-build-popover[open] .wd-build-popover__trigger {
+.wd-icon-chip:hover,
+.wd-hovercard:focus-within .wd-icon-chip,
+.wd-hovercard[data-open] .wd-icon-chip {
   border-color: var(--wd-accent);
   background: var(--wd-plate-hover);
+  color: var(--wd-accent-bright);
 }
-.wd-build-popover[open] .wd-build-popover__trigger::after {
-  transform: translateY(2px) rotate(225deg);
-}
-.wd-build-popover__panel {
+
+/* ---------- HoverCard: panel ----------
+   Hidden by default; CSS alone (:hover / :focus-within) is the baseline
+   that makes it work with zero script. The [data-open] attribute is the
+   script-driven click/tap pin — see HoverCard.astro — layered on top of
+   that same baseline, not a replacement for it. */
+.wd-hovercard__panel {
   position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
+  top: calc(100% + 0.6rem);
   z-index: 40;
   display: flex;
   flex-direction: column;
@@ -107,34 +118,89 @@
   background: var(--sl-color-bg-nav);
   box-shadow: var(--sl-shadow-lg);
   clip-path: var(--wd-clip-sm);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity var(--wd-fast) var(--wd-ease), transform var(--wd-fast) var(--wd-ease),
+    visibility var(--wd-fast) var(--wd-ease);
+  pointer-events: none;
 }
-.wd-build-popover__panel .wd-chip {
+.wd-hovercard[data-align='right'] .wd-hovercard__panel {
+  right: 0;
+}
+.wd-hovercard[data-align='left'] .wd-hovercard__panel {
+  left: 0;
+}
+.wd-hovercard:hover .wd-hovercard__panel,
+.wd-hovercard:focus-within .wd-hovercard__panel,
+.wd-hovercard[data-open] .wd-hovercard__panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+/* A small gap-filler so moving the mouse from trigger to panel doesn't
+   momentarily leave `.wd-hovercard` and close it before arriving. */
+.wd-hovercard__panel::before {
+  content: '';
+  position: absolute;
+  top: -0.6rem;
+  left: 0;
+  right: 0;
+  height: 0.6rem;
+}
+
+.wd-hovercard__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.wd-hovercard__rows .wd-chip {
   justify-content: flex-start;
   width: 100%;
   border-color: transparent;
   background: none;
 }
-.wd-build-popover__panel .wd-chip:hover {
+.wd-hovercard__rows .wd-chip:hover {
   background: var(--wd-plate);
   border-color: transparent;
 }
-.wd-build-popover__panel .wd-chip__label {
-  display: inline;
+
+/* ---------- SDK-version panel body ---------- */
+.wd-sdk-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.2rem 0.3rem;
+}
+.wd-sdk-panel__label {
+  font-family: var(--wd-font-mono);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wd-muted);
+}
+.wd-sdk-panel__value {
+  font-family: var(--wd-font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--wd-accent-bright);
+  font-variant-numeric: tabular-nums;
+}
+.wd-sdk-panel__desc {
+  margin: 0.2rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--wd-paper-dim);
 }
 
-/* Progressive shrink so the centred search box always has room.
-   Scoped with `>` so it only ever collapses the standalone SDK-version
-   chip's label — never the build-info trigger's (it's already just one
-   word) or the labels inside its open panel (.wd-build-popover__panel
-   restores those unconditionally above, since the panel is only ever
-   visible as an explicit, user-opened overlay with room to spare). */
-@media (max-width: 78rem) {
-  .wd-header-right > .wd-chip > .wd-chip__label {
-    display: none;
-  }
-}
+/* Progressive shrink so the centred search box always has room. Both
+   hovercards are now icon-only at every width, so there's no label to
+   collapse first the way the old text chips had — they just disappear
+   below the breakpoint the same as before. */
 @media (max-width: 60rem) {
-  .wd-build-popover {
+  .wd-hovercard {
     display: none;
   }
 }

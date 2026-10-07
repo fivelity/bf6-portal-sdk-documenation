@@ -1,17 +1,38 @@
 ---
 /**
- * SdkVersionBadge — shows the official four-part SDK version this build
- * documents (e.g. "SDK 1.4.3.0"). Value comes from sdk-info.ts, which
- * parses it out of the installed bf6-portal-mod-types package — never
- * hand-typed. See ../../data/sdk-info.ts for how it's derived.
+ * SdkVersionBadge — the official four-part SDK version this build
+ * documents (e.g. "1.4.3.0"). Value comes from sdk-info.ts, which parses
+ * it out of the installed bf6-portal-mod-types package — never hand-typed.
+ * See ../../data/sdk-info.ts for how it's derived.
+ *
+ * Icon-only hovercard trigger (see HoverCard.astro): the version number is
+ * useful to glance at but not something most visitors need spelled out in
+ * the header at all times, so it's tucked behind a tag icon like the
+ * build-info chip beside it.
  */
-import Chip from './Chip.astro';
+import HoverCard from '../HoverCard.astro';
 import { sdkStats } from '../../data/sdk-info';
 
 const title =
   sdkStats.sdkVersionSource === 'header'
-    ? `Official BF6 Portal SDK version ${sdkStats.sdkVersion}, read from the installed bf6-portal-mod-types package`
-    : `Official BF6 Portal SDK version ${sdkStats.sdkVersion} (derived from bf6-portal-mod-types@${sdkStats.modTypesVersion})`;
+    ? `Official BF6 Portal SDK version ${sdkStats.sdkVersion}, read from the installed bf6-portal-mod-types package.`
+    : `Official BF6 Portal SDK version ${sdkStats.sdkVersion} (derived from bf6-portal-mod-types@${sdkStats.modTypesVersion}).`;
 ---
 
-<Chip icon="tag" label="SDK" value={sdkStats.sdkVersion} title={title} />
+<HoverCard label={`SDK version ${sdkStats.sdkVersion}`}>
+  <Fragment slot="icon">
+    <path
+      d="M20 12.5 12.5 20a1.5 1.5 0 0 1-2.12 0l-6.38-6.38a1.5 1.5 0 0 1 0-2.12L11.5 4H19a1 1 0 0 1 1 1v7.5Z"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.6"
+      stroke-linejoin="round"
+    />
+    <circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" />
+  </Fragment>
+  <div class="wd-sdk-panel">
+    <span class="wd-sdk-panel__label">SDK version</span>
+    <span class="wd-sdk-panel__value">{sdkStats.sdkVersion}</span>
+    <p class="wd-sdk-panel__desc">{title}</p>
+  </div>
+</HoverCard>
